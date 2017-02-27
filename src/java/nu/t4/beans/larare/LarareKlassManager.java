@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.ejb.Stateless;
 import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
 import nu.t4.beans.ConnectionFactory;
@@ -54,7 +56,7 @@ public class LarareKlassManager {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             //Select info from elever where klass = klass_id if lärare has access to it
-            String sql = String.format("SELECT namn, id FROM google_anvandare "
+            String sql = String.format("SELECT namn, id, handledare_id FROM google_anvandare "
                     + "WHERE behorighet = 0 AND klass = %d AND %d IN (SELECT id FROM klass "
                     + "WHERE program_id = (SELECT program_id FROM klass "
                     + "WHERE id = (SELECT klass FROM google_anvandare "
@@ -64,11 +66,16 @@ public class LarareKlassManager {
             JsonArrayBuilder elever = Json.createArrayBuilder();
 
             while (data.next()) {
-                elever.add(Json.createObjectBuilder()
-                        .add("id", data.getInt("id"))
-                        .add("namn", data.getString("namn"))
-                        .build()
-                );
+                JsonObjectBuilder obuilder = Json.createObjectBuilder();
+                obuilder.add("id", data.getInt("id"))
+                        .add("namn", data.getString("namn"));
+                int hl_id = data.getInt("handledare_id");
+                if (data.wasNull()) {
+                    obuilder.add("hl_id", JsonObject.NULL);
+                } else {
+                    obuilder.add("hl_id", hl_id);
+                }
+                elever.add(obuilder.build());
             }
 
             conn.close();
