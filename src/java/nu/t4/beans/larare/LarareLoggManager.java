@@ -91,7 +91,7 @@ public class LarareLoggManager {
                 } else if (intryck == 2) {
                     stringIntryck = "bra";
                 } else {
-                    stringIntryck = "ERROR";
+                    stringIntryck = "okänt";
                 }
                 JsonObjectBuilder obuilder = Json.createObjectBuilder();
                 obuilder.add("id", data.getInt("id"))
@@ -99,7 +99,8 @@ public class LarareLoggManager {
                         .add("innehall", data.getString("innehall"))
                         .add("intryck", stringIntryck)
                         .add("datum", data.getString("datum"))
-                        .add("namn", data.getString("namn"));
+                        .add("namn", data.getString("namn"))
+                        .add("godkand", data.getString("godkand"));
                 //Hanterar om "bild" är null i databasen
                 String bild = data.getString("bild");
                 if (data.wasNull()) {
@@ -134,6 +135,7 @@ public class LarareLoggManager {
                         .add("datum", obj.getString("datum"))
                         .add("namn", obj.getString("namn"))
                         .add("bild", obj.get("bild"))
+                        .add("godkand", obj.get("godkand"))
                         .add("kommentarer", arrayBuilder2.build())
                         .build());
             }

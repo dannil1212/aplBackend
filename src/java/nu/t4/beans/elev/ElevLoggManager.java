@@ -43,7 +43,7 @@ public class ElevLoggManager {
                 } else if (intryck == 2) {
                     stringIntryck = "bra";
                 } else {
-                    stringIntryck = "ERROR";
+                    stringIntryck = "okänt";
                 }
                 JsonObjectBuilder obuilder = Json.createObjectBuilder();
                 obuilder.add("id", data.getInt("id"))
@@ -51,7 +51,8 @@ public class ElevLoggManager {
                         .add("innehall", data.getString("innehall"))
                         .add("intryck", stringIntryck)
                         .add("datum", data.getString("datum"))
-                        .add("namn", data.getString("namn"));
+                        .add("namn", data.getString("namn"))
+                        .add("godkand", data.getString("godkand"));
                 //Hanterar om "bild" är null i databasen
                 String bild = data.getString("bild");
                 if (data.wasNull()) {
@@ -86,6 +87,7 @@ public class ElevLoggManager {
                         .add("datum", obj.getString("datum"))
                         .add("namn", obj.getString("namn"))
                         .add("bild", obj.get("bild"))
+                        .add("godkand", obj.get("godkand"))
                         .add("kommentarer", arrayBuilder2.build())
                         .build());
             }
@@ -97,17 +99,18 @@ public class ElevLoggManager {
         }
     }
 
-    public boolean postLogg(int id, String innehall, String datum, int ljus, String bild) {
+    public boolean postLogg(int id, String innehall, String datum, int ljus, String bild, boolean privat) {
         try {
             java.sql.Connection conn = ConnectionFactory.getConnection();
             Statement stmt = (Statement) conn.createStatement();
             String sql = "";
+            int status = privat ? 3 : 0; // 0 = ej godkänd, 3 = privat
             if (bild != null) {
                 sql = String.format("INSERT INTO loggbok VALUES "
-                        + "(null,%d,'%s',%d,'%s','%s',0)", id, innehall, ljus, datum, bild);
+                        + "(null,%d,'%s',%d,'%s','%s', %d)", id, innehall, ljus, datum, bild, status);
             } else {
                 sql = String.format("INSERT INTO loggbok VALUES "
-                        + "(null,%d,'%s',%d,'%s',null,0)", id, innehall, ljus, datum);
+                        + "(null,%d,'%s',%d,'%s',null, %d)", id, innehall, ljus, datum, status);
             }
             stmt.executeUpdate(sql);
             conn.close();

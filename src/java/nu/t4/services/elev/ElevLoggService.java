@@ -86,13 +86,14 @@ public class ElevLoggService {
         int ljus = logg.getInt("ljus");
         String datum = logg.getString("datum");
         String innehall = logg.getString("innehall");
+        boolean privat = logg.getBoolean("privat");
         JsonValue bildValue = logg.get("imgUrl");
         String bild = null;
         if (bildValue != JsonValue.NULL) {
             bild = bildValue.toString();
         }
 
-        if (loggManager.postLogg(id, innehall, datum, ljus, bild)) {
+        if (loggManager.postLogg(id, innehall, datum, ljus, bild, privat)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.serverError().build();
