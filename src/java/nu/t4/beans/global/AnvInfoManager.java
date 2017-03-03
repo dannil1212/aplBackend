@@ -35,8 +35,13 @@ public class AnvInfoManager {
             obj.add("namn", data.getString("namn"))
                     .add("tfnr", data.getString("tfnr"))
                     .add("email", data.getString("email"))
-                    .add("klass", data.getInt("klass"))
-                    .add("hl_id", data.getInt("hl_id"));
+                    .add("klass", data.getInt("klass"));
+            int hl_id = data.getInt("hl_id");
+            if (data.wasNull()) {
+                obj.add("hl_id", JsonObject.NULL);
+            } else {
+                obj.add("hl_id", hl_id);
+            }
 
             conn.close();
             return obj.build();

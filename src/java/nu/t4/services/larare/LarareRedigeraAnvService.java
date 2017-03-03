@@ -62,7 +62,9 @@ public class LarareRedigeraAnvService {
         String tfnr = obj.getString("tfnr");
         String email = obj.getString("email");
         int klass = obj.getInt("klass");
-        int handledar_id = obj.getInt("hl_id");
+        int handledar_id = -1;
+        if (!obj.isNull("hl_id"))
+            handledar_id = obj.getInt("hl_id");
         if (anvManager.redigeraElev(id, namn, tfnr, email, klass, handledar_id)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
