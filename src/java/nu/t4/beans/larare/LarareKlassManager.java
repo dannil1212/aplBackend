@@ -50,6 +50,21 @@ public class LarareKlassManager {
             return null;
         }
     }
+    
+    
+    public boolean setKlass(int larare_id, int klass_id) {
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = String.format("UPDATE google_anvandare SET klass=%d WHERE id=%d", klass_id, larare_id);
+            stmt.execute(sql);
+            conn.close();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 
     public JsonArray getElever(int anv_id, int klass_id) {
         try {
