@@ -15,6 +15,7 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import nu.t4.beans.ConnectionFactory;
 import org.mindrot.jbcrypt.BCrypt;
+import org.primefaces.context.RequestContext;
 
 /**
  *
@@ -214,6 +215,26 @@ public class AdminManager implements Serializable {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.execute("PF('larareTable').filter()");
+        requestContext.execute("PF('anvTable').filter()");
+    }
+    
+    //Tar bort behörigheten som lärare mha deras email
+    public void removeBehorighet(String email) {
+        System.out.println("removing" + email);
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = String.format("UPDATE google_anvandare SET behorighet = 0 WHERE email ='%s'", email);
+            stmt.executeUpdate(sql);
+            conn.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.execute("PF('larareTable').filter()");
+        requestContext.execute("PF('anvTable').filter()");
     }
 
     //Hämtar alla som har lärarbehörighet
@@ -299,21 +320,7 @@ public class AdminManager implements Serializable {
             return null;
         }
     }
-
-    //Tar bort behörigheten som lärare mha deras email
-    public void removeBehorighet(String email) {
-        System.out.println("removing" + email);
-        try {
-            Connection conn = ConnectionFactory.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = String.format("UPDATE google_anvandare SET behorighet = 0 WHERE email ='%s'", email);
-            stmt.executeUpdate(sql);
-            conn.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
+    
     //Lägger till ett nytt program
     public void addProgram() {
         try {
@@ -441,16 +448,27 @@ public class AdminManager implements Serializable {
             String tfnr = selectedUser.getTfnr();
             String email = selectedUser.getEmail();
             int klass = selectedUser.getKlass();
+            System.out.println(selectedUser.getHl_id());
             int hl_id = selectedUser.getHl_id();
 
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = String.format("UPDATE google_anvandare SET namn = '%s', "
+            String sql = "";
+            if (hl_id == 0) {
+                sql = String.format("UPDATE google_anvandare SET namn = '%s', "
+                    + "telefonnummer = '%s', "
+                    + "email = '%s', "
+                    + "handledare_id = null, "
+                    + "klass = %d "
+                    + "WHERE id = %d", namn, tfnr, email, klass, id);
+            } else {
+                sql = String.format("UPDATE google_anvandare SET namn = '%s', "
                     + "telefonnummer = '%s', "
                     + "email = '%s', "
                     + "handledare_id = %d, "
                     + "klass = %d "
                     + "WHERE id = %d", namn, tfnr, email, hl_id, klass, id);
+            }
             stmt.executeUpdate(sql);
             conn.close();
             return "redigeraSkStart";
@@ -492,5 +510,18 @@ public class AdminManager implements Serializable {
             System.out.println(e.getMessage());
             return "redigeraHL";
         }
+    }
+    public void resetFilters() {
+        setFilteredAnv(getSkolansAnvandare());
+        setFilteredHL(getHandledareAnv());
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.execute("PF('anvTable').filter()");
+    }
+    public void resetLarareFilter() {
+        setFilteredLarare(getLarare());
+        setFilteredUsers(getUsers());
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.execute("PF('larareTable').filter()");
+        requestContext.execute("PF('userTable').filter()");
     }
 }

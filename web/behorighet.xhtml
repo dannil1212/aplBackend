@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>Admin - APL-App</title>
     </h:head>
@@ -37,12 +38,23 @@
                         <h:form>
                             <h:outputLabel value="Användare utan behörighet"/>
                             <br/>
-                            <p:dataTable var="usersList" value='#{adminManager.users}' filteredValue="#{adminManager.filteredUsers}">
-                                <p:column filterBy="#{usersList}" headerText="Sök" filterMatchMode="contains">
-                                    <h:panelGrid columns="2">
-                                        <h:outputText value="#{usersList}" />
-                                        <h:commandLink id="info" action="#{adminManager.setBehorighet(usersList)}" value="#"/>
-                                    </h:panelGrid>
+                            <p:dataTable var="usersList"
+                                         value='#{adminManager.users}'
+                                         widgetVar="userTable"
+                                         filteredValue="#{adminManager.filteredUsers}">
+                                <f:facet name="header">
+                                    <p:outputPanel style="width: 200px;">
+                                        <h:outputText value="Sök:" />
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('userTable').filter()" 
+                                                     placeholder="Ange sökord:"/>
+                                    </p:outputPanel>
+                                </f:facet>
+                                <p:column headerText="Email" filterBy="#{usersList}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{usersList}" />
+                                </p:column>
+                                <p:column headerText="Ge Behörighet">
+                                    <h:commandLink id="info" action="#{adminManager.setBehorighet(usersList)}" value="#"/>
                                 </p:column>
                             </p:dataTable>
                         </h:form>
@@ -54,15 +66,27 @@
                         <h:panelGrid columns="2">
                             <h:outputLabel value="Användare med behörighet"/>
                             <br/>
-                            <p:dataTable var="larareList" value='#{adminManager.larare}' filteredValue="#{adminManager.filteredLarare}">
-                                <p:column filterBy="#{larareList}" headerText="Sök" filterMatchMode="contains">
-                                    <h:panelGrid columns="2">
-                                        <h:outputText value="#{larareList}" />
+                            <p:dataTable var="larareList"
+                                         value='#{adminManager.larare}'
+                                         widgetVar="larareTable"
+                                         filteredValue="#{adminManager.filteredLarare}">
+                                <f:facet name="header">
+                                    <p:outputPanel style="width: 200px;">
+                                        <h:outputText value="Sök:" />
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('larareTable').filter()" 
+                                                     placeholder="Ange sökord:"/>
+                                    </p:outputPanel>
+                                </f:facet>
+                                <p:column headerText="Email" filterBy="#{larareList}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{larareList}" />
+                                </p:column>
+                                <p:column headerText="Ge Behörighet">
                                         <h:commandLink id="info" action="#{adminManager.removeBehorighet(larareList)}" value="X"/>
-                                    </h:panelGrid>
                                 </p:column>
                             </p:dataTable>
                         </h:panelGrid>
+                        <p:remoteCommand name="onload" actionListener="#{adminManager.resetLarareFilter}" autoRun="true" />
                     </h:form>
                 </p:layoutUnit>
 

@@ -69,6 +69,7 @@
                                     </p:commandButton>
                                 </p:column>
                             </p:dataTable>
+                            <p:remoteCommand name="onload" actionListener="#{adminManager.resetFilters}" autoRun="true" />
                         </h:form>
                     </h:panelGrid>
                 </p:layoutUnit>                  
