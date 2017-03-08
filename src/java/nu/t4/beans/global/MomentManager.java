@@ -242,22 +242,10 @@ public class MomentManager {
             JsonArrayBuilder moment = Json.createArrayBuilder();
 
             while (data.next()) {
-                String status = "";
-                if (data.getInt("godkand") == 0) {
-                    status = "Ej avklarad";
-                } else if (data.getInt("godkand") == 1) {
-                    status = "Väntande svar";
-                } else if (data.getInt("godkand") == 2) {
-                    status = "Godkänd";
-                } else if (data.getInt("godkand") == 3) {
-                    status = "Nekad";
-                } else {
-                    status = "error";
-                }
                 moment.add(Json.createObjectBuilder()
                         .add("id", data.getInt("moment_id"))
                         .add("innehall", data.getString("innehall"))
-                        .add("status", status)
+                        .add("status", data.getInt("godkand"))
                         .build());
             }
 
