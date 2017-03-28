@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Admin - APL-App</title>
+    </h:head>
+    <h:body>
+        <c:if test="#{loginBean.loggedIn}">
+
+            <p:layout fullPage="true">
+
+                <p:layoutUnit position="north" size="100">
+                    <h:form>
+                        <h:panelGroup>
+                            <h:commandButton value="Logga ut" action="#{loginBean.logout()}"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:layoutUnit>
+
+                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
+
+                </p:layoutUnit>
+
+
+                <p:layoutUnit position="west" size="243">
+                    <ui:include src="template/menu.xhtml"/>
+                </p:layoutUnit>
+
+                <p:layoutUnit position="center">
+                    <h:panelGrid columns="2">
+                        <h:form>
+                            <p:dataTable var="user" 
+                                         value='#{adminManager.users}' 
+                                         resizableColumns="true"
+                                         widgetVar="anvTable"
+                                         filteredValue="#{adminManager.filteredRadElever}"
+                                         emptyMessage="Ingen användare hittades">
+                                <f:facet name="header">
+                                    <p:outputPanel style="width: 200px;">
+                                        <h:outputText value="Sök:" />
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('anvTable').filter()" 
+                                                     placeholder="Ange sökord:"/>
+                                    </p:outputPanel>
+                                </f:facet>
+
+                                <p:column headerText="Namn" filterBy="#{user.namn}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{user.namn}" />
+                                </p:column>
+                                <p:column headerText="Email" filterBy="#{user.email}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{user.email}" />
+                                </p:column>
+                                <p:column headerText="Välj">
+                                    <p:commandButton value="Radera" actionListener="#{adminManager.raderaGoogle(user.id)}">
+                                        <p:confirm header="Confirmation" message="Är du säker?" icon="ui-icon-alert" />
+                                    </p:commandButton>
+
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                        <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="Nej" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </p:confirmDialog>
+                                </p:column>
+                            </p:dataTable>
+                            <p:remoteCommand name="onload" actionListener="#{adminManager.resetFilters}" autoRun="true" />
+                        </h:form>
+                    </h:panelGrid>
+                </p:layoutUnit>                  
+
+            </p:layout>
+
+        </c:if>
+    </h:body>
+</html>
+
+
+

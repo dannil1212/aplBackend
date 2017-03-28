@@ -11,8 +11,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
 import nu.t4.beans.ConnectionFactory;
 import org.mindrot.jbcrypt.BCrypt;
 import org.primefaces.context.RequestContext;
@@ -28,6 +30,9 @@ public class AdminManager implements Serializable {
     private String klassnamn;
     private String programnamn;
     private String programIdNamn;
+    private List filteredRadElever;
+    private List filteredRadLarare;
+    private List filteredRadHL;
     private List filteredUsers;
     private List filteredHL;
     private List filteredAnv;
@@ -35,7 +40,31 @@ public class AdminManager implements Serializable {
     private Users selectedUser;
     private Users selectedHL;
 
-    //Getters och setters start
+    //Getters och setters start    
+    public List getFilteredRadElever() {
+        return filteredRadElever;
+    }
+
+    public void setFilteredRadElever(List filteredRadElever) {
+        this.filteredRadElever = filteredRadElever;
+    }
+
+    public List getFilteredRadLarare() {
+        return filteredRadLarare;
+    }
+
+    public void setFilteredRadLarare(List filteredRadLarare) {
+        this.filteredRadLarare = filteredRadLarare;
+    }
+
+    public List getFilteredRadHL() {
+        return filteredRadHL;
+    }
+
+    public void setFilteredRadHL(List filteredRadHL) {
+        this.filteredRadHL = filteredRadHL;
+    }
+    
     public List getFilteredHL() {
         return filteredHL;
     }
@@ -182,17 +211,16 @@ public class AdminManager implements Serializable {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "SELECT namn, email, behorighet FROM google_anvandare WHERE behorighet = 0";
+            String sql = "SELECT id, namn, email FROM google_anvandare WHERE behorighet = 0";
             ResultSet data = stmt.executeQuery(sql);
-            //List<Users> users = new ArrayList();
-            //Users user = new Users();
+            
             List users = new ArrayList();
             while (data.next()) {
-                users.add(data.getObject("email"));
-//              user.setNamn(data.getString("namn"));
-//              user.setEmail(data.getString("email"));
-//              user.setBehorighet("behorighet");
-//              users.add(user);
+                Users user = new Users();
+                user.setId(data.getInt("id"));
+                user.setEmail(data.getString("email"));
+                user.setNamn(data.getString("namn"));
+                users.add(user);
             }
             conn.close();
             return users;
@@ -242,11 +270,16 @@ public class AdminManager implements Serializable {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "SELECT namn, email FROM google_anvandare WHERE behorighet = 1";
+            String sql = "SELECT id, namn, email FROM google_anvandare WHERE behorighet = 1";
             ResultSet data = stmt.executeQuery(sql);
+            
             List larare = new ArrayList();
             while (data.next()) {
-                larare.add(data.getObject("email"));
+                Users user = new Users();
+                user.setId(data.getInt("id"));
+                user.setEmail(data.getString("email"));
+                user.setNamn(data.getString("namn"));
+                larare.add(user);
             }
             conn.close();
             return larare;
@@ -488,7 +521,7 @@ public class AdminManager implements Serializable {
             String foretag = selectedHL.getForetag();
             String anvnamn = selectedHL.getAnvnamn();
             String losenord = selectedHL.getLosenord().trim();
-
+            
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format("UPDATE handledare SET namn = '%s', "
@@ -511,9 +544,40 @@ public class AdminManager implements Serializable {
             return "redigeraHL";
         }
     }
+    public String raderaHandledare(int id) {
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = String.format("DELETE FROM handledare WHERE id = %d", id);
+            stmt.executeUpdate(sql);
+            conn.close();
+            resetFilters();
+            return "raderaMain";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "raderaMain";
+        }
+    }
+    public String raderaGoogle(int id) {
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = String.format("DELETE FROM google_anvandare WHERE id = %d", id);
+            stmt.executeUpdate(sql);
+            conn.close();
+            resetFilters();
+            return "raderaMain";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return "raderaMain";
+        }
+    }
     public void resetFilters() {
         setFilteredAnv(getSkolansAnvandare());
         setFilteredHL(getHandledareAnv());
+        setFilteredRadHL(getHandledareAnv());
+        setFilteredRadLarare(getLarare());
+        setFilteredRadElever(getUsers());
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.execute("PF('anvTable').filter()");
     }
