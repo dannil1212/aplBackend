@@ -50,11 +50,11 @@
                                                      placeholder="Ange sökord:"/>
                                     </p:outputPanel>
                                 </f:facet>
-                                <p:column headerText="Email" filterBy="#{usersList}" filterMatchMode="contains" filterStyle="display:none">
-                                    <h:outputText value="#{usersList}" />
+                                <p:column headerText="Email" filterBy="#{usersList.id}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{usersList.email}" />
                                 </p:column>
                                 <p:column headerText="Ge Behörighet">
-                                    <h:commandLink id="info" action="#{adminManager.setBehorighet(usersList)}" value="#"/>
+                                    <h:commandLink id="info" action="#{adminManager.setBehorighet(usersList.email)}" value="#"/>
                                 </p:column>
                             </p:dataTable>
                         </h:form>
@@ -78,11 +78,11 @@
                                                      placeholder="Ange sökord:"/>
                                     </p:outputPanel>
                                 </f:facet>
-                                <p:column headerText="Email" filterBy="#{larareList}" filterMatchMode="contains" filterStyle="display:none">
-                                    <h:outputText value="#{larareList}" />
+                                <p:column headerText="Email" filterBy="#{larareList.id}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{larareList.email}" />
                                 </p:column>
                                 <p:column headerText="Ge Behörighet">
-                                        <h:commandLink id="info" action="#{adminManager.removeBehorighet(larareList)}" value="X"/>
+                                        <h:commandLink id="info" action="#{adminManager.removeBehorighet(larareList.email)}" value="X"/>
                                 </p:column>
                             </p:dataTable>
                         </h:panelGrid>
