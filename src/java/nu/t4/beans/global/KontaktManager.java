@@ -93,10 +93,10 @@ public class KontaktManager {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format("SELECT namn, email AS mail, telefonnummer AS tfnr FROM elevkontakt "
-                    + "WHERE elevkontakt.id = (SELECT id FROM google_anvandare WHERE handledare_id = %d) "
+                    + "WHERE elevkontakt.id IN (SELECT id FROM google_anvandare WHERE handledare_id = %d) "
                     + "UNION "
                     + "SELECT lararnamn AS namn, lararmail AS mail, lararnr AS tfnr FROM lararekontakt "
-                    + "WHERE klass = (SELECT klass FROM google_anvandare WHERE handledare_id = %d)",
+                    + "WHERE klass IN (SELECT klass FROM google_anvandare WHERE handledare_id = %d)",
                     hl_id, hl_id);
             ResultSet data = stmt.executeQuery(sql);
             JsonArrayBuilder jBuilder = Json.createArrayBuilder();

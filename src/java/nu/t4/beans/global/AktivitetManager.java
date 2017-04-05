@@ -37,8 +37,8 @@ public class AktivitetManager {
             switch (tabell) {
                 case HANDLEDARE:
                     sql = String.format("SELECT * FROM aktiviteter "
-                            + "WHERE anvandar_id = (SELECT id FROM google_anvandare "
-                            + "WHERE handledare_id = %d)", anv_id);
+                            + "WHERE anvandar_id IN (SELECT id FROM google_anvandare "
+                            + "WHERE handledare_id = %d) ORDER BY anvandar_id", anv_id) ;
                     break;
                 case NEKADE:
                     sql = String.format("SELECT * FROM nekade_aktiviteter "
@@ -48,18 +48,25 @@ public class AktivitetManager {
                     break;
             }
             ResultSet data = stmt.executeQuery(sql);
-            JsonArrayBuilder jBuilder = Json.createArrayBuilder();
-
+            JsonArrayBuilder aktivitetListGroupBuilder = Json.createArrayBuilder();
+            JsonArrayBuilder aktivitetListBuilder = Json.createArrayBuilder();
+            int lastID = -1;
             while (data.next()) {
                 //Eftersom många kolumner kan vara (och är) null så måste det
                 //hanteras genom att göra dem till Json null
+                int newID = data.getInt("anvandar_id");
+                if (lastID == -1)
+                    lastID = newID;
+                else if (lastID != newID) {
+                    aktivitetListGroupBuilder.add(aktivitetListBuilder.build());
+                    aktivitetListBuilder = Json.createArrayBuilder();
+                }
                 JsonObjectBuilder obuilder = Json.createObjectBuilder();
                 int typ = data.getInt("typ");
                 obuilder.add("typ", typ);
                 int id = data.getInt("id");
                 obuilder.add("id", id);
-                int elev_id = data.getInt("anvandar_id");
-                obuilder.add("elev_id", elev_id);
+                obuilder.add("elev_id", newID);
                 String innehall = data.getString("innehall");
                 if (data.wasNull()) {
                     obuilder.add("innehall", JsonObject.NULL);
@@ -84,11 +91,11 @@ public class AktivitetManager {
                 } else {
                     obuilder.add("bild", bild);
                 }
-                jBuilder.add(obuilder.build());
+                aktivitetListBuilder.add(obuilder.build());
             }
-
+            aktivitetListGroupBuilder.add(aktivitetListBuilder.build());
             conn.close();
-            return jBuilder.build();
+            return aktivitetListGroupBuilder.build();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -103,18 +110,18 @@ public class AktivitetManager {
             switch (typ) {
                 case NARVARO:
                     sql = String.format("UPDATE narvaro SET godkand = %d "
-                            + "WHERE narvaro_id = %d AND anvandar_id = (SELECT id FROM google_anvandare "
+                            + "WHERE narvaro_id = %d AND anvandar_id IN (SELECT id FROM google_anvandare "
                             + "WHERE handledare_id = %d)", godkand, aktivitets_id, handledare_id);
                     break;
                 case LOGGBOK:
                     sql = String.format("UPDATE loggbok SET godkand = %d "
-                            + "WHERE id = %d AND elev_id = (SELECT id FROM google_anvandare "
+                            + "WHERE id = %d AND elev_id IN (SELECT id FROM google_anvandare "
                             + "WHERE handledare_id = %d)", godkand, aktivitets_id, handledare_id);
                     break;
                 case MOMENT:
                     godkand++;
                     sql = String.format("UPDATE koppla_moment_elev SET godkand = %d "
-                            + "WHERE moment_id = %d AND anvandar_id = (SELECT id FROM google_anvandare "
+                            + "WHERE moment_id = %d AND anvandar_id IN (SELECT id FROM google_anvandare "
                             + "WHERE handledare_id = %d)", godkand, aktivitets_id, handledare_id);
                     break;
                 default:

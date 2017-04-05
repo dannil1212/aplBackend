@@ -230,11 +230,11 @@ public class MomentManager {
         try {
             Connection conn = ConnectionFactory.getConnection();
             com.mysql.jdbc.Statement stmt = (com.mysql.jdbc.Statement) conn.createStatement();
-            String sql = String.format("SELECT moment.innehall, "
+            String sql = String.format("SELECT moment.innehall, koppla_moment_elev.anvandar_id, "
                     + "koppla_moment_elev.godkand, koppla_moment_elev.moment_id "
                     + "FROM moment, koppla_moment_elev "
                     + "WHERE moment.id = koppla_moment_elev.moment_id "
-                    + "AND koppla_moment_elev.anvandar_id = "
+                    + "AND koppla_moment_elev.anvandar_id IN "
                     + "(select id from google_anvandare where handledare_id = %d)",
                     handledar_id);
             ResultSet data = stmt.executeQuery(sql);
@@ -244,6 +244,7 @@ public class MomentManager {
             while (data.next()) {
                 moment.add(Json.createObjectBuilder()
                         .add("id", data.getInt("moment_id"))
+                        .add("elev_id", data.getInt("anvandar_id"))
                         .add("innehall", data.getString("innehall"))
                         .add("status", data.getInt("godkand"))
                         .build());
