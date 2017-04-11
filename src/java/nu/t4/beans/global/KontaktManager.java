@@ -92,10 +92,12 @@ public class KontaktManager {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = String.format("SELECT namn, email AS mail, telefonnummer AS tfnr FROM elevkontakt "
+            String sql = String.format("SELECT namn, email AS mail, "
+                    + "telefonnummer AS tfnr, 0 AS behorighet FROM elevkontakt "
                     + "WHERE elevkontakt.id IN (SELECT id FROM google_anvandare WHERE handledare_id = %d) "
                     + "UNION "
-                    + "SELECT lararnamn AS namn, lararmail AS mail, lararnr AS tfnr FROM lararekontakt "
+                    + "SELECT lararnamn AS namn, lararmail AS mail, "
+                    + "lararnr AS tfnr, 1 AS behorighet FROM lararekontakt "
                     + "WHERE klass IN (SELECT klass FROM google_anvandare WHERE handledare_id = %d)",
                     hl_id, hl_id);
             ResultSet data = stmt.executeQuery(sql);
@@ -106,6 +108,7 @@ public class KontaktManager {
                         .add("namn", data.getString("namn"))
                         .add("mail", data.getString("mail"))
                         .add("tfnr", data.getString("tfnr"))
+                        .add("behorighet", data.getInt("behorighet"))
                         .build()
                 );
             }

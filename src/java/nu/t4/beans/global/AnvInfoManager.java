@@ -133,4 +133,29 @@ public class AnvInfoManager {
             return null;
         }
     }
+
+    public JsonArray getHandledarePerProgram(int id) {
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = String.format("SELECT id, namn, foretag FROM handledare "
+                    + "WHERE handledare.program_id = %d ", id);
+            ResultSet data = stmt.executeQuery(sql);
+            JsonArrayBuilder jBuilder = Json.createArrayBuilder();
+            while (data.next()) {
+                String namn_foretag = data.getString("namn") + " - " + data.getString("foretag");
+                jBuilder.add(Json.createObjectBuilder()
+                        .add("id", data.getInt("id"))
+                        .add("namn_foretag", namn_foretag)
+                        .build()
+                );
+            }
+
+            conn.close();
+            return jBuilder.build();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

@@ -30,7 +30,7 @@ public class LarareHandledareService {
     @GET
     @Path("/handledare/natverk")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProgram(@Context HttpHeaders headers) {
+    public Response getHLNatverk(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);

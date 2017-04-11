@@ -126,6 +126,37 @@ public class InfoService {
             return Response.serverError().build();
         }
     }
+    
+    @GET
+    @Path("/handledare/program/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getHLPerProgram(@Context HttpHeaders headers, @PathParam("id") int id) {
+        //Kollar att inloggningen är ok
+        String idTokenString = headers.getHeaderString("Authorization");
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
+        if (payload == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        JsonObject user = manager.getGoogleUser(payload.getSubject());
+        if (user == null) {
+
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        int behorighet = user.getInt("behorighet");
+
+        if (behorighet != 1) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        JsonArray data = infoManager.getHandledarePerProgram(id);
+        if (data != null) {
+            return Response.ok(data).build();
+        } else {
+            return Response.serverError().build();
+        }
+    }
 
     @GET
     @Path("/handledare/lista/alla")
