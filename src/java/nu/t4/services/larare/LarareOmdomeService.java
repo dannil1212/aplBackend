@@ -58,4 +58,36 @@ public class LarareOmdomeService {
             return Response.serverError().build();
         }
     }
+    
+    @GET
+    @Path("/klass/{id}/omdome/{year}/{month}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getOmdomeNew(@Context HttpHeaders headers, 
+            @PathParam("id") int klass_id, @PathParam("year") int year, @PathParam("month") int month) {
+
+        String idTokenString = headers.getHeaderString("Authorization");
+
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
+
+        if (payload == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        JsonObject user = manager.getGoogleUser(payload.getSubject());
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        int behorighet = user.getInt("behorighet");
+
+        if (behorighet != 1) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        JsonArray data = larareOmdomeManager.getOmdome(klass_id, year, month);
+        if (data != null) {
+            return Response.ok(data).build();
+        } else {
+            return Response.serverError().build();
+        }
+    }
 }

@@ -48,6 +48,37 @@ public class LarareOmdomeManager {
             System.out.println(e.getMessage());
             return null;
         }
+    }
 
+    public JsonArray getOmdome(int klass_id, int year, int month) {
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = (Statement) conn.createStatement();
+            String sql = String.format(
+                    "SELECT * FROM intryck_per_month "
+                    + "WHERE klass = %d AND y = %d AND m = %d ORDER BY namn",
+                    klass_id, year, month
+            );
+            ResultSet data = stmt.executeQuery(sql);
+            JsonArrayBuilder array = Json.createArrayBuilder();
+            while (data.next()) {
+                array.add(Json.createObjectBuilder()
+                        .add("id", data.getString("id"))
+                        .add("namn", data.getString("namn"))
+                        .add("antal0", data.getInt("intryck0"))
+                        .add("antal1", data.getInt("intryck1"))
+                        .add("antal2", data.getInt("intryck2"))
+                        .build()
+                );
+            }
+
+            conn.close();
+            return array.build();
+
+        } catch (Exception e) {
+            System.out.println("LarareOmdomeManager");
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }
