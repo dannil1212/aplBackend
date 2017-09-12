@@ -94,6 +94,7 @@ public class ElevLoggManager {
             conn.close();
             return arrayBuilder.build();
         } catch (Exception e) {
+            System.out.println("getLoggar");
             System.out.println(e.getMessage());
             return null;
         }
@@ -106,11 +107,15 @@ public class ElevLoggManager {
             String sql = "";
             int status = privat ? 3 : 0; // 0 = ej godkänd, 3 = privat
             if (bild != null) {
-                sql = String.format("INSERT INTO loggbok VALUES "
-                        + "(null,%d,'%s',%d,'%s','%s', %d)", id, innehall, ljus, datum, bild, status);
+                sql = String.format("INSERT INTO loggbok "
+                        + "(elev_id, innehall, intryck, datum, bild, godkand) "
+                        + "VALUES (%d,'%s',%d,'%s','%s', %d)",
+                        id, innehall, ljus, datum, bild, status);
             } else {
-                sql = String.format("INSERT INTO loggbok VALUES "
-                        + "(null,%d,'%s',%d,'%s',null, %d)", id, innehall, ljus, datum, status);
+                sql = String.format("INSERT INTO loggbok "
+                        + "(elev_id, innehall, intryck, datum, godkand) "
+                        + "VALUES (%d,'%s',%d,'%s', %d)",
+                        id, innehall, ljus, datum, status);
             }
             stmt.executeUpdate(sql);
             conn.close();

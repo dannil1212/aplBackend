@@ -33,10 +33,13 @@ public class MomentManager {
      * @param Innehåll beskrivning av momentet
      * @return true om det skapats någonting annars false
      */
-    public boolean skapaMoment(int user_id, String Innehall) {
+    public boolean skapaMoment(int user_id, String innehall) {
         try {
             Connection conn = ConnectionFactory.getConnection();
-            String sql = String.format("INSERT into aplapp.moment VALUES(null, %d,'%s');", user_id, Innehall);
+            String sql = String.format("INSERT INTO aplapp.moment "
+                    + "(anvandar_id, innehall) "
+                    + "VALUES (%d,'%s')",
+                    user_id, innehall);
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);
             conn.close();
@@ -171,7 +174,9 @@ public class MomentManager {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
 
-            String sqlbase = "INSERT INTO koppla_moment_elev(anvandar_id, moment_id, godkand) VALUES (%d,%d,0);";
+            String sqlbase = "INSERT INTO koppla_moment_elev "
+                    + "(anvandar_id, moment_id, godkand) "
+                    + "VALUES (%d,%d,0);";
             Iterator<JsonValue> mIterator = moment.iterator();
             while (mIterator.hasNext()) {
                 JsonObject momentet = (JsonObject) mIterator.next();

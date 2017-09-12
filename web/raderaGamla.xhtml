@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Admin - APL-App</title>
+    </h:head>
+    <h:body>
+        <c:if test="#{loginBean.loggedIn}">
+
+            <p:layout fullPage="true">
+
+                <p:layoutUnit position="north" size="100">
+                    <h:form>
+                        <h:panelGroup>
+                            <h:commandButton value="Logga ut" action="#{loginBean.logout()}"/>
+                        </h:panelGroup>
+                    </h:form>
+                </p:layoutUnit>
+
+                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
+
+                </p:layoutUnit>
+
+
+                <p:layoutUnit position="west" size="243">
+                    <ui:include src="template/menu.xhtml"/>
+                </p:layoutUnit>
+
+                <p:layoutUnit position="center">
+                </p:layoutUnit>                  
+
+            </p:layout>
+
+        </c:if>
+    </h:body>
+</html>
+
+
+

@@ -81,7 +81,7 @@
                                 <p:column headerText="Email" filterBy="#{larareList.id}" filterMatchMode="contains" filterStyle="display:none">
                                     <h:outputText value="#{larareList.email}" />
                                 </p:column>
-                                <p:column headerText="Ge Behörighet">
+                                <p:column headerText="Ta Bort Behörighet">
                                         <h:commandLink id="info" action="#{adminManager.removeBehorighet(larareList.email)}" value="X"/>
                                 </p:column>
                             </p:dataTable>

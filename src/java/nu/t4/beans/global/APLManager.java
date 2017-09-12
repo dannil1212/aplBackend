@@ -40,8 +40,9 @@ public class APLManager {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format(
-                    "INSERT INTO google_anvandare VALUES"
-                    + "('%s',null,'%s','%s','%s',%d,null,1,0)",
+                    "INSERT INTO google_anvandare "
+                            + "(google_id, namn, telefonnummer, email, klass, behorighet)  "
+                            + "VALUES ('%s','%s','%s','%s',%d,0)",
                     googleid, namn, tfnr, email, klass
             );
             stmt.execute(sql);
@@ -175,8 +176,9 @@ public class APLManager {
             Statement stmt = conn.createStatement();
             String encrypted_losenord = BCrypt.hashpw(losenord, BCrypt.gensalt());
             String sql = String.format(
-                    "INSERT INTO handledare VALUES"
-                    + "(null, '%s','%s','%s','%s','%s', %d, '%s')",
+                    "INSERT INTO handledare "
+                            + "(namn, anvandarnamn, email, losenord, telefonnummer, program_id, foretag)"
+                            + "VALUES ('%s','%s','%s','%s','%s', %d, '%s')",
                     namn, anvandarnamn, email, encrypted_losenord, tfnr, program_id, foretag
             );
             stmt.executeUpdate(sql);
@@ -253,4 +255,18 @@ public class APLManager {
             return -1;
         }
     }
+
+    public void updateLastLogin(int id) {
+        try {
+            Connection conn = ConnectionFactory.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = String.format("UPDATE google_anvandare SET senast_inloggad = now() "
+                    + "WHERE id = %d", id);
+            stmt.executeUpdate(sql);
+            conn.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
+

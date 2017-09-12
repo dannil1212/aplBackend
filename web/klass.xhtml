@@ -57,13 +57,21 @@
                 </p:layoutUnit>
 
                 <p:layoutUnit position="east" size="50%">
-                    <h:form>
-                        <h:panelGrid columns="2">
-                            <h:outputLabel value="Klicka på krysset för att radera"/>
-                            <br/>
-                            <c:forEach items="#{adminManager.classes}" var="classesList">
-                                <h:outputText value="${classesList}"/>
-                                <h:commandLink id="info" action="#{adminManager.removeClass(classesList)}" value="x"/>
+                    <h:form id="classListForm">
+                        <h:panelGrid columns="3" id="classListGrid">
+                            <c:forEach items="#{adminManager.classes}" var="class">
+                                <h:outputText value="${class}"/>
+                                <p:commandLink actionListener="#{adminManager.removeClass(class)}" value="Radera ${class}">
+                                    <p:confirm header="Bekräftelse" message="Är du HELT säker? Klassen kommer raderas och eleverna kommer behöva en ny klass." icon="ui-icon-alert" />
+                                </p:commandLink>
+
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" 
+                                                     onclick="setTimeout(function () {
+                                                                 window.location.replace(window.location.href);
+                                                             }, 100)"/>
+                                    <p:commandButton value="Nej" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                                </p:confirmDialog>                            
                             </c:forEach>
                         </h:panelGrid>
                     </h:form>

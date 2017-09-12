@@ -27,8 +27,9 @@ public class KommentarManager {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = String.format("INSERT INTO kommentar VALUES"
-                    + "(NULL,%d,%d,'%s','%s')",
+            String sql = String.format("INSERT INTO kommentar "
+                    + "(anvandar_id, loggbok_id, innehall, datum) "
+                    + "VALUES (%d,%d,'%s','%s')",
                     anvandar_id, loggbok_id, innehall, datum);
             stmt.executeUpdate(sql);
             return true;

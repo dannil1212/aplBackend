@@ -158,7 +158,10 @@ public class AdminManager implements Serializable {
             if (!klassnamn.equals("") && programid != 0) {
                 Connection conn = ConnectionFactory.getConnection();
                 Statement stmt = conn.createStatement();
-                String sql = String.format("INSERT INTO klass VALUES(NULL, '%s', %d)", klassnamn, programid);
+                String sql = String.format(
+                        "INSERT INTO klass (namn, program_id) "
+                        + "VALUES('%s', %d)",
+                        klassnamn, programid);
                 stmt.executeUpdate(sql);
                 conn.close();
             }
@@ -361,7 +364,8 @@ public class AdminManager implements Serializable {
                 programnamn = programnamn.trim();
                 Connection conn = ConnectionFactory.getConnection();
                 Statement stmt = conn.createStatement();
-                String sql = String.format("INSERT INTO program VALUES(NULL, '%s')", programnamn);
+                String sql = String.format("INSERT INTO program (namn) "
+                        + "VALUES ('%s')", programnamn);
                 stmt.executeUpdate(sql);
                 conn.close();
             }

@@ -48,6 +48,7 @@ public class APLService {
         int behorighet = -1;
         if (user != null) {
             behorighet = user.getInt("behorighet");
+            manager.updateLastLogin(user.getInt("id"));
         }
         JsonObject data = Json.createObjectBuilder().add("behorighet", behorighet).build();
         return Response.ok(data).build();

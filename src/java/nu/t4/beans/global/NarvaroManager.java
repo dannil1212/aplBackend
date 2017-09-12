@@ -53,7 +53,9 @@ public class NarvaroManager {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = (Statement) conn.createStatement();
-            String sqlbase = "INSERT INTO narvaro VALUES(null, %d, %d, 0, '%s')";
+            String sqlbase = "INSERT INTO narvaro "
+                    + "(anvandar_id, trafikljus, godkand, datum) "
+                    + "VALUES (%d, %d, 0, '%s')";
             String sql = "";
 
             JsonObject item = array;
