@@ -27,10 +27,10 @@ public class LarareKlassManager {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = String.format("SELECT id, namn FROM aplapp.klass "
+            String sql = String.format("SELECT id, namn FROM klass "
                     + "WHERE program_id = (SELECT program_id FROM klass "
                     + "WHERE id = (SELECT klass FROM google_anvandare "
-                    + "WHERE id = %d));", larare_id);
+                    + "WHERE id = %d)) ORDER BY klass.namn;", larare_id);
             ResultSet data = stmt.executeQuery(sql);
 
             JsonArrayBuilder klasser = Json.createArrayBuilder();

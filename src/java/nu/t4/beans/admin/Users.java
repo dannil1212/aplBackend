@@ -24,6 +24,8 @@ public class Users {
     private String anvnamn;
     private String losenord;
     private String namn_foretag;
+    private String senast_inloggad;
+    private String created;
 
     public String getForetag() {
         return foretag;
@@ -127,5 +129,21 @@ public class Users {
 
     public void setBehorighet(int behorighet) {
         this.behorighet = behorighet;
+    }
+
+    public String getSenast_inloggad() {
+        return senast_inloggad;
+    }
+
+    public void setSenast_inloggad(String senast_inloggad) {
+        this.senast_inloggad = senast_inloggad;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
     }
 }

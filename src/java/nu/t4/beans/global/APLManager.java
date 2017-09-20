@@ -195,7 +195,7 @@ public class APLManager {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = String.format("SELECT * FROM klass");
+            String sql = String.format("SELECT * FROM klass ORDER BY namn");
             ResultSet data = stmt.executeQuery(sql);
             JsonArrayBuilder jBuilder = Json.createArrayBuilder();
 

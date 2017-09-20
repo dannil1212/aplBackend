@@ -31,7 +31,97 @@
                     <ui:include src="template/menu.xhtml"/>
                 </p:layoutUnit>
 
-                <p:layoutUnit position="center">
+                
+                <p:layoutUnit position="center" size="300">
+                    <h:form>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="Hur länge sedan (minst 12 månader)" for="gamlaMonths"/>
+                            <br/>
+                            <p:inputText value="#{adminManager.gamlaMonths}" 
+                                         id="gamlaMonths">
+                                <p:ajax event="keyup" listener="#{adminManager.resetFilters}"></p:ajax>
+                           </p:inputText>
+                            <br/>
+                            <p:selectOneMenu id="gamlaListaTyp" value="#{adminManager.gamlaListaTyp}">
+                                <f:selectItem itemLabel="Elever" itemValue="0"/>
+                                <f:selectItem itemLabel="Lärare" itemValue="1"/>
+                                <p:ajax event="change" listener="#{adminManager.resetFilters}"></p:ajax>
+                            </p:selectOneMenu>
+                        </h:panelGrid>
+                        <hr />
+                        <h:panelGroup>
+                            <p:commandButton value="Radera inaktiva användare" actionListener="#{adminManager.raderaGamlaAnv()}">
+                                <p:confirm header="Bekräftelse" message="Är du säker? Alla användare i listan kommer tas bort." icon="ui-icon-alert" />
+                            </p:commandButton>
+
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Ja" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="Nej" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog>
+                        </h:panelGroup >
+                        <hr />
+                        <p:dataTable id = "ignoredTable" 
+                                        var="ignored" 
+                                        rowIndexVar="rowId"
+                                        value='#{adminManager.ignoreradeGamla}' 
+                                         resizableColumns="true"
+                                         widgetVar="ignoreTable"
+                                         emptyMessage="Ingen användare ignorerad">
+                                <f:facet name="header">
+                                        <h:outputText value="Ignorerade" />
+                                        <p:commandButton value="Töm ignorerade" actionListener="#{adminManager.tomIgnorerade()}" update="@widgetVar(ignoreTable)" />
+                                </f:facet>
+
+                                <p:column headerText="Namn">
+                                    <h:outputText value="#{ignored.namn}" />
+                                </p:column>
+                                <p:column headerText="Email">
+                                    <h:outputText value="#{ignored.email}" />
+                                </p:column>
+                                <p:column headerText="Senaste Inloggning">
+                                    <h:outputText value="#{ignored.senast_inloggad}" />
+                                </p:column>
+                                <p:column>
+                                    <p:commandButton value="Sluta Ignorera" actionListener="#{adminManager.slutaIgnoreraGammal(rowId)}" update="@widgetVar(ignoreTable)" />
+                                </p:column>
+                            </p:dataTable>
+                    </h:form>
+                </p:layoutUnit>
+                
+                <p:layoutUnit position="east" size="40%">
+                    <h:panelGrid columns="2">
+                        <h:form>
+                            <p:dataTable var="user" 
+                                         value='#{adminManager.gamlaAnv}' 
+                                         resizableColumns="true"
+                                         widgetVar="anvTable"
+                                         filteredValue="#{adminManager.filteredRadGamla}"
+                                         emptyMessage="Ingen användare hittades">
+                                <f:facet name="header">
+                                    <p:outputPanel style="width: 200px;">
+                                        <h:outputText value="Sök:" />
+                                        <p:inputText id="globalFilter"
+                                                     onkeyup="PF('anvTable').filter()" 
+                                                     placeholder="Ange sökord:"/>
+                                    </p:outputPanel>
+                                </f:facet>
+
+                                <p:column headerText="Namn" filterBy="#{user.namn}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{user.namn}" />
+                                </p:column>
+                                <p:column headerText="Email" filterBy="#{user.email}" filterMatchMode="contains" filterStyle="display:none">
+                                    <h:outputText value="#{user.email}" />
+                                </p:column>
+                                <p:column headerText="Senaste Inloggning">
+                                    <h:outputText value="#{user.senast_inloggad}" />
+                                </p:column>
+                                <p:column>
+                                    <p:commandButton value="Ignorera" actionListener="#{adminManager.ignoreraGammal(user)}" update="@widgetVar(ignoreTable)"/>
+                                </p:column>
+                            </p:dataTable>
+                            <p:remoteCommand name="onload" actionListener="#{adminManager.resetFilters}" autoRun="true" />
+                        </h:form>
+                    </h:panelGrid>
                 </p:layoutUnit>                  
 
             </p:layout>
