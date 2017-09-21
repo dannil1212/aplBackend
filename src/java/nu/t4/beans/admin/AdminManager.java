@@ -689,9 +689,21 @@ public class AdminManager implements Serializable {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = String.format("DELETE FROM google_anvandare WHERE id = %d", id);
+            
+            String sql = String.format("SELECT bild FROM loggbok, google_anvandare "
+                    + "WHERE google_anvandare.id = %d "
+                    + "AND google_anvandare.id = loggbok.elev_id "
+                    + "AND bild IS NOT NULL ", id);
+            
+            ResultSet data = stmt.executeQuery(sql);
+            List bilder = new ArrayList<>();
+            while (data.next()) {
+                bilder.add(data.getString("bild"));
+            }
+            sql = String.format("DELETE FROM google_anvandare WHERE id = %d", id);
             stmt.executeUpdate(sql);
             conn.close();
+            raderaBilder(bilder);
             resetFilters();
             return "raderaMain";
         } catch (Exception e) {
