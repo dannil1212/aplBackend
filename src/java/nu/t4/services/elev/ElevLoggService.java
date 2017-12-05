@@ -86,7 +86,13 @@ public class ElevLoggService {
         int ljus = logg.getInt("ljus");
         String datum = logg.getString("datum");
         String innehall = logg.getString("innehall");
-        boolean privat = logg.getBoolean("privat");
+        boolean privat;
+        //Temporärt tills de loggböcker som skulle blivit skickade har blivit det.
+        try {
+            privat = logg.getBoolean("privat");
+        } catch (Exception e) {
+            privat = true;
+        }
         JsonValue bildValue = logg.get("imgUrl");
         String bild = null;
         if (bildValue != JsonValue.NULL) {
