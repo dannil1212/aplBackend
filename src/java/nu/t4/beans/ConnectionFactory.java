@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans;
 
 import com.mysql.jdbc.Connection;
@@ -15,9 +10,9 @@ import java.sql.SQLException;
  */
 public class ConnectionFactory {
 
-    //Databas inloggning
+    //Databas inloggning, lägg inte upp det riktiga lösenordet på github
     private static final String DATABASE_USER = "aplapp";
-    private static final String DATABASE_PASS = "H0A%!i984t7e";
+    private static final String DATABASE_PASS = "qwerty";
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");

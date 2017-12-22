@@ -38,7 +38,6 @@ public class ElevLoggService {
     @Path("/logg")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLoggar(@Context HttpHeaders headers) {
-
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
@@ -47,7 +46,6 @@ public class ElevLoggService {
         }
         JsonObject elev = manager.getGoogleUser(payload.getSubject());
         if (elev == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         int anvandar_id = elev.getInt("id");
@@ -87,7 +85,8 @@ public class ElevLoggService {
         String datum = logg.getString("datum");
         String innehall = logg.getString("innehall");
         boolean privat;
-        //Temporärt tills de loggböcker som skulle blivit skickade har blivit det.
+        //Temporär trycatch tills de loggböcker som skulle blivit skickade har blivit det.
+        //Om du läser det här kan du nog ta bort den
         try {
             privat = logg.getBoolean("privat");
         } catch (Exception e) {
@@ -109,7 +108,6 @@ public class ElevLoggService {
     @DELETE
     @Path("/logg/{id}/radera")
     public Response raderaNarvaro(@Context HttpHeaders headers, @PathParam("id") int loggbok_id) {
-
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);

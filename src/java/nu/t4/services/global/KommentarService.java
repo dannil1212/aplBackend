@@ -2,21 +2,15 @@ package nu.t4.services.global;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import java.io.StringReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import javax.ejb.EJB;
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -41,11 +35,12 @@ public class KommentarService {
     public Response postLogg(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+        
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
-
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        
         JsonObject anvandare = manager.getGoogleUser(payload.getSubject());
         if (anvandare == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -73,17 +68,19 @@ public class KommentarService {
     @DELETE
     @Path("{id}/radera")
     public Response raderaNarvaro(@Context HttpHeaders headers, @PathParam("id") int kommentar_id) {
-
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+        
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        
         int anvandar_id = user.getInt("id");
 
         if (kommentarManager.raderaKommentar(kommentar_id, anvandar_id)) {

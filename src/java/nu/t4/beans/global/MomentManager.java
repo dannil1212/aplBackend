@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.global;
 
 import com.mysql.jdbc.Connection;
@@ -61,7 +56,9 @@ public class MomentManager {
     public JsonArray seMoment(int elev_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
-            String sql = String.format("SELECT * FROM aplapp.koppla_moment_elev, moment WHERE koppla_moment_elev.anvandar_id = %d AND moment_id = moment.id;;", elev_id);
+            String sql = String.format("SELECT * FROM aplapp.koppla_moment_elev, moment "
+                    + "WHERE koppla_moment_elev.anvandar_id = %d "
+                    + "AND moment_id = moment.id;", elev_id);
             Statement stmt = conn.createStatement();
             ResultSet data = stmt.executeQuery(sql);
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
@@ -88,11 +85,10 @@ public class MomentManager {
      * Funktion som hämtar alla momenten som den inloggade läraren har
      * skapat</p>
      *
-     * @param lärar_id
+     * @param larar_id
      * @return jsonarray med [{id:number, innehall:varchar},..]
      */
     public JsonArray seMomentLarare(int larar_id) {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -121,7 +117,7 @@ public class MomentManager {
      * Funktion som raderar det valda momentet som läraren har skapat</p>
      *
      * @param moment_id
-     * @param lärar_id
+     * @param larar_id
      * @return true om raderingen lyckas annars false
      */
     public boolean raderaMomentLarare(int moment_id, int larar_id) {
@@ -143,7 +139,7 @@ public class MomentManager {
      * Funktion som raderar det valda momentet som är tilldelat till eleven</p>
      *
      * @param moment_id
-     * @param användar_id
+     * @param anvandar_id
      * @return true om raderingen lyckas annars false
      */
     public boolean raderaMomentElev(int moment_id, int anvandar_id) {
@@ -198,6 +194,7 @@ public class MomentManager {
         }
     }
 
+    //Hämta alla moment för en elev
     public JsonArray getMomentElev(int id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -205,7 +202,8 @@ public class MomentManager {
             String sql = String.format(
                     "SELECT moment.innehall, koppla_moment_elev.godkand, koppla_moment_elev.moment_id "
                     + "FROM moment, koppla_moment_elev "
-                    + "WHERE moment.id = koppla_moment_elev.moment_id AND koppla_moment_elev.anvandar_id =%d", id
+                    + "WHERE moment.id = koppla_moment_elev.moment_id "
+                    + "AND koppla_moment_elev.anvandar_id =%d", id
             );
 
             ResultSet data = stmt.executeQuery(sql);
@@ -231,6 +229,7 @@ public class MomentManager {
 
     }
 
+    //Hämta alla moment för handledarens elever
     public JsonArray getMomentPerHandledare(int handledar_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -266,6 +265,7 @@ public class MomentManager {
 
     }
 
+    //Sätt moment till väntande (1) när eleven skickar sitt moment
     public boolean skickaMomentTillHandledare(int moment_id, int anvandar_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();

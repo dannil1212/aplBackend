@@ -38,13 +38,14 @@ public class APLService {
     public Response googleAuth(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         JsonObject user = manager.getGoogleUser(payload.getSubject());
 
+        //Skicka tillbaka behörighet
         int behorighet = -1;
         if (user != null) {
             behorighet = user.getInt("behorighet");
@@ -71,7 +72,6 @@ public class APLService {
     @Path("/google/registrera")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registerGoogleUser(String body) {
-
         //Skapa ett json objekt av indatan
         JsonReader jsonReader = Json.createReader(new StringReader(body));
         JsonObject jsonObject = jsonReader.readObject();
@@ -117,6 +117,7 @@ public class APLService {
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        //Se till att användaren är en lärare
         if (user.getInt("behorighet") != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -144,6 +145,7 @@ public class APLService {
     @Path("klass")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getKlasser() {
+        //Ingen inloggning, används i registrering
         JsonArray data = manager.getKlasser();
         if (data != null) {
             return Response.ok(data).build();

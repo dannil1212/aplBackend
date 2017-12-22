@@ -30,11 +30,14 @@ public class LarareEleverService {
     @Path("/elever")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getElever(@Context HttpHeaders headers) {
+        //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
 
@@ -64,11 +67,12 @@ public class LarareEleverService {
     public Response getLog(@Context HttpHeaders headers, @PathParam("id") int elev_id) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -80,7 +84,7 @@ public class LarareEleverService {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        JsonArray data = loggLarareManager.getLoggar(user.getInt("id"), elev_id);
+        JsonArray data = loggLarareManager.getLoggar(elev_id);
         if (data != null) {
             return Response.ok(data).build();
         } else {

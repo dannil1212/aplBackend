@@ -20,11 +20,10 @@ import org.mindrot.jbcrypt.BCrypt;
 public class loginBean implements Serializable {
 
     private String username;
-
     private String password;
-
     private boolean loggedIn;
 
+    //Getters & Setters
     public boolean isLoggedIn() {
         return loggedIn;
     }
@@ -49,15 +48,15 @@ public class loginBean implements Serializable {
         this.password = password;
     }
 
+    //Kolla inloggningen
     public String login() {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format("SELECT * FROM admin WHERE anvandarnamn = '%s'", username);
             ResultSet data = stmt.executeQuery(sql);
 
-            data.next();//ta ut första raden
+            data.next();//Ta ut första raden
             String hashedpwd = data.getString("losenord");
             if (BCrypt.checkpw(password, hashedpwd)) {
                 conn.close();

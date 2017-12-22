@@ -31,11 +31,12 @@ public class LarareNarvaroService {
     public Response getGodkandNarvaroLarare(@Context HttpHeaders headers, @PathParam("id") int klass_id) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = aplManager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = aplManager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = aplManager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();

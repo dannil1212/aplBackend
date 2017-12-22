@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.global;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -35,14 +30,15 @@ public class APLManager {
     //id för vår app
     private final String CLIENT_id = "550162747744-m4r2h8egnvqicsbhoefdlo54lk8q399n.apps.googleusercontent.com";
 
+    //Registrera ny elev
     public boolean registerGoogleUser(String googleid, String namn, int klass, String tfnr, String email) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format(
                     "INSERT INTO google_anvandare "
-                            + "(google_id, namn, telefonnummer, email, klass, behorighet)  "
-                            + "VALUES ('%s','%s','%s','%s',%d,0)",
+                    + "(google_id, namn, telefonnummer, email, klass, behorighet)  "
+                    + "VALUES ('%s','%s','%s','%s',%d,0)",
                     googleid, namn, tfnr, email, klass
             );
             stmt.execute(sql);
@@ -55,12 +51,14 @@ public class APLManager {
         }
     }
 
+    //Verfiera googleinloggning & skicka tillbaka payload
     public GoogleIdToken.Payload googleAuth(String idTokenString) {
         //Varibler för verifiering
         HttpTransport httpTransport;
         JsonFactory jsonFactory;
         GoogleIdTokenVerifier verifier;
         try {
+            //Skapa ny verifierare
             jsonFactory = JacksonFactory.getDefaultInstance();
             httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             verifier = new GoogleIdTokenVerifier.Builder(httpTransport, jsonFactory)
@@ -71,6 +69,7 @@ public class APLManager {
         }
         GoogleIdToken idToken;
         try {
+            //Verifiera
             idToken = verifier.verify(idTokenString);
         } catch (Exception ex) {
             return null;
@@ -83,31 +82,36 @@ public class APLManager {
             //if (payload.getHostedDomain().equals(APPS_DOMAIN_NAME)) {
             /*
             } else {
-                return Response.status(Response.Status.FORBidDEN).build();
+                return Response.status(Response.Status.FORBIDDEN).build();
             }*/
         } else {
             return null;
         }
     }
 
+    //Verifiera handledareinloggning
     public boolean handledarAuth(String basic_auth) {
         try {
-
+            //Ta bort "BASIC "
             basic_auth = basic_auth.substring(basic_auth.indexOf(" ") + 1, basic_auth.length());
 
+            //Avkoda
             byte[] decoded = Base64.getDecoder().decode(basic_auth);
             String userPass = new String(decoded);
 
+            //Ta ut anvnamn & lösenord
             String anvandarnamn = userPass.substring(0, userPass.indexOf(":"));
             String losenord = userPass.substring(userPass.indexOf(":") + 1, userPass.length());
 
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
+            //Hämta handledaren med användarnamnet
             String sql = String.format(
                     "SELECT * FROM handledare WHERE anvandarnamn = '%s'",
                     anvandarnamn);
             ResultSet result = stmt.executeQuery(sql);
             result.next();
+            //Verifiera lösenordet
             if (BCrypt.checkpw(losenord, result.getString("losenord"))) {
                 conn.close();
                 return true;
@@ -121,6 +125,7 @@ public class APLManager {
         }
     }
 
+    //Hämta elev / lärare med google_id
     public JsonObject getGoogleUser(String google_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -147,6 +152,8 @@ public class APLManager {
         }
     }
 
+    //Ta bort användare med google_id eller användarnamn
+    //      Endast för användning i automatiska test
     public boolean deleteUser(String key, boolean googleUser) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -170,15 +177,17 @@ public class APLManager {
         }
     }
 
+    //Registrera ny handledare
     public boolean registerHandledare(String anvandarnamn, String namn, String losenord, String tfnr, String email, int program_id, String foretag) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
+            //Kryptera lösenord
             String encrypted_losenord = BCrypt.hashpw(losenord, BCrypt.gensalt());
             String sql = String.format(
                     "INSERT INTO handledare "
-                            + "(namn, anvandarnamn, email, losenord, telefonnummer, program_id, foretag)"
-                            + "VALUES ('%s','%s','%s','%s','%s', %d, '%s')",
+                    + "(namn, anvandarnamn, email, losenord, telefonnummer, program_id, foretag)"
+                    + "VALUES ('%s','%s','%s','%s','%s', %d, '%s')",
                     namn, anvandarnamn, email, encrypted_losenord, tfnr, program_id, foretag
             );
             stmt.executeUpdate(sql);
@@ -191,6 +200,7 @@ public class APLManager {
         }
     }
 
+    //Hämtar alla klasser, används i registrering & lärare som byter klass
     public JsonArray getKlasser() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -214,30 +224,17 @@ public class APLManager {
         }
     }
 
-    public boolean deleteLogg(int id, String datum) {
-        try {
-            Connection conn = ConnectionFactory.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql;
-            sql = String.format("DELETE FROM loggbok WHERE "
-                    + "elev_id = %d AND datum = '%s'", id, datum);
-            stmt.executeUpdate(sql);
-            conn.close();
-            return true;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
-
+    //Hämtar handledare ID
     public int getHandledarId(String basic_auth) {
         try {
-
+            //Ta bort "BASIC "
             basic_auth = basic_auth.substring(basic_auth.indexOf(" ") + 1, basic_auth.length());
 
+            //Avkoda
             byte[] decoded = Base64.getDecoder().decode(basic_auth);
             String userPass = new String(decoded);
 
+            //Hämta användarnamn
             String anvandarnamn = userPass.substring(0, userPass.indexOf(":"));
 
             Connection conn = ConnectionFactory.getConnection();
@@ -256,6 +253,7 @@ public class APLManager {
         }
     }
 
+    //Uppdatera senaste inloggning
     public void updateLastLogin(int id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -269,4 +267,3 @@ public class APLManager {
         }
     }
 }
-

@@ -97,6 +97,7 @@ public class ElevAktivitetService {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Hämta nekade med 1
         int id = elev.getInt("id");
         int NEKADE = 1;
 

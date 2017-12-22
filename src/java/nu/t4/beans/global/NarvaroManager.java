@@ -19,37 +19,8 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class NarvaroManager {
 
-    public JsonArray getNarvaro() {
-        try {
-            Connection conn = ConnectionFactory.getConnection();
-            Statement stmt = (Statement) conn.createStatement();
-            String sql = "SELECT * FROM narvaro";
-            ResultSet data = stmt.executeQuery(sql);
-
-            JsonArrayBuilder elever = Json.createArrayBuilder();
-
-            while (data.next()) {
-                elever.add(Json.createObjectBuilder()
-                        .add("narvaro_id", data.getInt("narvaro_id"))
-                        .add("anvandar_id", data.getInt("anvandar_id"))
-                        .add("trafikljus", data.getInt("trafikljus"))
-                        .add("godkand", data.getInt("godkand"))
-                        .add("datum", data.getString("datum"))
-                        .build());
-            }
-
-            conn.close();
-            return elever.build();
-
-        } catch (Exception e) {
-            System.out.println("NarvaroManagar - getNarvaro()");
-            System.out.println(e.getMessage());
-            return null;
-        }
-
-    }
-
-    public boolean setNarvaro(JsonObject array, int id) {
+    //Spara ny närvaro
+    public boolean setNarvaro(JsonObject obj, int id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = (Statement) conn.createStatement();
@@ -58,9 +29,8 @@ public class NarvaroManager {
                     + "VALUES (%d, %d, 0, '%s')";
             String sql = "";
 
-            JsonObject item = array;
-            int trafikljus = item.getInt("trafikljus");
-            String datum = item.getString("datum");
+            int trafikljus = obj.getInt("trafikljus");
+            String datum = obj.getString("datum");
             sql = String.format(sqlbase, id, trafikljus, datum);
             stmt.executeUpdate(sql);
             conn.close();
@@ -73,12 +43,15 @@ public class NarvaroManager {
         }
     }
 
+    //Hämta ej nekad närvaro för alla elever i klass
     public JsonArray getGodkandNarvaro(int larare_id, int klass_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = (Statement) conn.createStatement();
+            //Hämta elever i klassen om läraren är i samma program som klassen
             String sql = String.format("SELECT namn, id FROM google_anvandare "
-                    + "WHERE behorighet = 0 AND klass = %d AND %d IN (SELECT id FROM klass "
+                    + "WHERE behorighet = 0 AND klass = %d "
+                    + "AND %d IN (SELECT id FROM klass "
                     + "WHERE program_id = (SELECT program_id FROM klass "
                     + "WHERE id = (SELECT klass FROM google_anvandare "
                     + "WHERE id = %d)))", klass_id, klass_id, larare_id);
@@ -99,6 +72,7 @@ public class NarvaroManager {
                 int elev_id = obj.getInt("elev_id");
                 String namn = obj.getString("namn");
 
+                //Hämta närvaron som ej är nekad
                 sql = String.format("SELECT UNIX_TIMESTAMP(datum) AS datum, trafikljus, godkand FROM narvaro "
                         + "WHERE anvandar_id = %d AND godkand != 2 ORDER BY datum", elev_id);
 
@@ -110,22 +84,22 @@ public class NarvaroManager {
                             .add("godkant", data2.getInt("godkand"))
                             .build());
                 }
+                //Lägg ihop närvaron med elevens namn/id
                 arrayBuilder.add(Json.createObjectBuilder()
                         .add("elev_id", elev_id)
                         .add("namn", namn)
                         .add("narvaro", arrayBuilder2.build())
                         .build());
             }
-
             conn.close();
             return arrayBuilder.build();
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
 
+    //Hämta ej nekad närvaro för specifik elev
     public JsonArray getGodkandNarvaroElev(int elev_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -143,21 +117,20 @@ public class NarvaroManager {
                         .add("godkant", data.getInt("godkand"))
                         .build());
             }
-
             conn.close();
             return arrayBuilder.build();
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
 
-    public boolean raderaNarvaro(int narvaro_id, int elevid) {
+    //Ta bort närvaro
+    public boolean raderaNarvaro(int narvaro_id, int elev_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             java.sql.Statement stmt = conn.createStatement();
-            String sql = String.format("DELETE FROM narvaro WHERE narvaro_id = %d AND anvandar_id = %d", narvaro_id, elevid);
+            String sql = String.format("DELETE FROM narvaro WHERE narvaro_id = %d AND anvandar_id = %d", narvaro_id, elev_id);
             stmt.executeUpdate(sql);
             return true;
         } catch (Exception e) {

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.global;
 
 import com.mysql.jdbc.Connection;
@@ -22,6 +17,7 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class KommentarManager {
 
+    //Spara ny kommentar
     public boolean postKommentar(int anvandar_id, int loggbok_id,
             String innehall, String datum) {
         try {
@@ -39,8 +35,8 @@ public class KommentarManager {
         }
     }
 
+    //Hämta kommentarer för loggbok
     public JsonArray getKommentar(int logg_id) {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -64,11 +60,15 @@ public class KommentarManager {
         }
     }
 
+    //Ta bort kommentar
     public boolean raderaKommentar(int kommentar_id, int anvandar_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             java.sql.Statement stmt = conn.createStatement();
-            String sql = String.format("DELETE FROM kommentar WHERE kommentar_id = %d AND anvandar_id = %d", kommentar_id, anvandar_id);
+            String sql = String.format("DELETE FROM kommentar "
+                    + "WHERE kommentar_id = %d "
+                    + "AND anvandar_id = %d",
+                    kommentar_id, anvandar_id);
             stmt.executeUpdate(sql);
             return true;
         } catch (Exception e) {

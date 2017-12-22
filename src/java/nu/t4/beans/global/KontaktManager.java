@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.global;
 
 import java.sql.Connection;
@@ -21,6 +16,7 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class KontaktManager {
 
+    //Hämta kontakter för elev
     public JsonArray getElevKontakt(int elev_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -53,20 +49,20 @@ public class KontaktManager {
         }
     }
 
+    //Hämta kontakter för lärare
     public JsonArray getKontaktLarare(int klass_id) {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format("SELECT "
-                    + "google_anvandare.namn AS elevnamn, \n"
-                    + "google_anvandare.email AS elevmail, \n"
-                    + "google_anvandare.telefonnummer AS elevnummer,\n"
-                    + "handledare.namn AS hlnamn,\n"
-                    + "handledare.email AS hlmail,\n"
-                    + "handledare.telefonnummer AS hlnummer\n"
-                    + "FROM google_anvandare, handledare\n"
-                    + "WHERE google_anvandare.handledare_id = handledare.id\n"
+                    + "google_anvandare.namn AS elevnamn, "
+                    + "google_anvandare.email AS elevmail, "
+                    + "google_anvandare.telefonnummer AS elevnummer, "
+                    + "handledare.namn AS hlnamn, "
+                    + "handledare.email AS hlmail, "
+                    + "handledare.telefonnummer AS hlnummer "
+                    + "FROM google_anvandare, handledare "
+                    + "WHERE google_anvandare.handledare_id = handledare.id "
                     + "AND google_anvandare.klass = %d", klass_id);
             ResultSet data = stmt.executeQuery(sql);
             JsonArrayBuilder jsonArray = Json.createArrayBuilder();
@@ -88,6 +84,7 @@ public class KontaktManager {
         }
     }
 
+    //Hämta kontakter för handledare
     public JsonArray getHLKontakt(int hl_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();

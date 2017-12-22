@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.global;
 
 import java.sql.Connection;
@@ -23,8 +18,8 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class AnvInfoManager {
 
+    //Hämtar elev info för redigera användare (läraresidan)
     public JsonObject getElevInfo(int elev_id) {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -51,8 +46,8 @@ public class AnvInfoManager {
         }
     }
 
+    //Hämtar handledare info för redigera användare (läraresidan)
     public JsonObject getHandledareInfo(int hl_id) {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -75,9 +70,8 @@ public class AnvInfoManager {
         }
     }
 
-    //Hämtar alla lediga handledare
+    //Hämtar alla lediga handledare i klassens program
     public JsonArray getHandledare(int klass_id) { //Använder klassid för att hämta program
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -106,9 +100,8 @@ public class AnvInfoManager {
         }
     }
 
-    //Hämtar alla handledare i ditt program
+    //Hämtar alla handledare i klassens program
     public JsonArray getHandledareAlla(int klass_id) { //Använder klassid för att hämta program
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -134,6 +127,7 @@ public class AnvInfoManager {
         }
     }
 
+    //Hämtar alla handledare i program
     public JsonArray getHandledarePerProgram(int id) {
         try {
             Connection conn = ConnectionFactory.getConnection();

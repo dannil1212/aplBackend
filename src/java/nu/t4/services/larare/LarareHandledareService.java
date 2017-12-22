@@ -13,7 +13,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import nu.t4.beans.global.APLManager;
-import nu.t4.beans.global.AktivitetManager;
 
 /**
  *
@@ -33,10 +32,12 @@ public class LarareHandledareService {
     public Response getHLNatverk(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();

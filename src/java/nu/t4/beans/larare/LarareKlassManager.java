@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.larare;
 
 import java.sql.Connection;
@@ -23,6 +18,7 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class LarareKlassManager {
 
+    //Hämtar klasser i lärarens program
     public JsonArray getKlasser(int larare_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -50,8 +46,8 @@ public class LarareKlassManager {
             return null;
         }
     }
-    
-    
+
+    //Byter klass på läraren
     public boolean setKlass(int larare_id, int klass_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -66,11 +62,12 @@ public class LarareKlassManager {
         }
     }
 
+    //Hämta elever i klass
     public JsonArray getElever(int anv_id, int klass_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            //Select info from elever where klass = klass_id if lärare has access to it
+            //Hämta elever i klassen om den är i lärarens program
             String sql = String.format("SELECT namn, id, handledare_id FROM google_anvandare "
                     + "WHERE behorighet = 0 AND klass = %d AND %d IN (SELECT id FROM klass "
                     + "WHERE program_id = (SELECT program_id FROM klass "
@@ -99,7 +96,5 @@ public class LarareKlassManager {
             System.out.println(e.getMessage());
             return null;
         }
-
     }
-
 }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.larare;
 
 import com.mysql.jdbc.Connection;
@@ -21,6 +16,7 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class LarareOmdomeManager {
 
+    //Hämtar omdöme för alla elever i en klass för nuvarande månad
     public JsonArray getOmdome(int klass_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -39,10 +35,8 @@ public class LarareOmdomeManager {
                         .build()
                 );
             }
-
             conn.close();
             return array.build();
-
         } catch (Exception e) {
             System.out.println("LarareOmdomeManager");
             System.out.println(e.getMessage());
@@ -50,6 +44,7 @@ public class LarareOmdomeManager {
         }
     }
 
+    //Hämtar omdöme för alla elever i en klass för en specifik månad
     public JsonArray getOmdome(int klass_id, int year, int month) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -71,10 +66,8 @@ public class LarareOmdomeManager {
                         .build()
                 );
             }
-
             conn.close();
             return array.build();
-
         } catch (Exception e) {
             System.out.println("LarareOmdomeManager");
             System.out.println(e.getMessage());

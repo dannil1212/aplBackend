@@ -40,11 +40,12 @@ public class LarareMomentService {
     public Response skapaMoment(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -66,19 +67,21 @@ public class LarareMomentService {
     @Path("/moment")
     @Produces(MediaType.APPLICATION_JSON)
     public Response seMomentLarare(@Context HttpHeaders headers) {
-
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        int behorighet = user.getInt("behorighet");
 
+        //Se till att användaren är en lärare
+        int behorighet = user.getInt("behorighet");
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }

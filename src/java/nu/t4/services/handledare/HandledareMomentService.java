@@ -29,6 +29,7 @@ public class HandledareMomentService {
     @Path("/moment")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMomentPerHandledare(@Context HttpHeaders headers) {
+        //Kollar att inloggningen är ok
         String basic_auth = headers.getHeaderString("Authorization");
 
         if (!manager.handledarAuth(basic_auth)) {

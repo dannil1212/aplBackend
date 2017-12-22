@@ -1,7 +1,6 @@
 package nu.t4.services.handledare;
 
 import java.io.StringReader;
-import nu.t4.beans.larare.LarareHandledareManager;
 import javax.ejb.EJB;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -38,6 +37,7 @@ public class HandledareService {
     @Path("/aktivitet")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response uppdateraAktivitet(@Context HttpHeaders headers, String body) {
+        //Kollar att inloggningen är ok
         String basic_auth = headers.getHeaderString("Authorization");
 
         if (!manager.handledarAuth(basic_auth)) {
@@ -58,11 +58,12 @@ public class HandledareService {
             return Response.serverError().build();
         }
     }
-    
+
     @GET
     @Path("/elever")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHLElever(@Context HttpHeaders headers) {
+        //Kollar att inloggningen är ok
         String basic_auth = headers.getHeaderString("Authorization");
 
         if (!manager.handledarAuth(basic_auth)) {

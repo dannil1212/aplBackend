@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.elev;
 
 import com.mysql.jdbc.Connection;
@@ -25,6 +20,7 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class ElevLoggManager {
 
+    //Hämtar loggböcker från elev
     public JsonArray getLoggar(int elev_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -62,13 +58,17 @@ public class ElevLoggManager {
                 }
                 arrayBuilder.add(obuilder.build());
             }
+            //Hämta kommentarer
             JsonArray array1 = arrayBuilder.build();
             Iterator<JsonValue> iterator = array1.iterator();
+            //Varje loggbok
             while (iterator.hasNext()) {
                 JsonObject obj = (JsonObject) iterator.next();
                 JsonArrayBuilder arrayBuilder2 = Json.createArrayBuilder();
                 int logg_id = obj.getInt("id");
+                //Hämta kommentarer för loggboken
                 sql = "SELECT * FROM kommentarvy WHERE loggbok_id =" + logg_id;
+                //Spara kommentarerna
                 ResultSet data2 = stmt.executeQuery(sql);
                 JsonArrayBuilder jsonArray = Json.createArrayBuilder();
                 while (data2.next()) {
@@ -79,6 +79,7 @@ public class ElevLoggManager {
                             .add("namn", data2.getString("namn"));
                     arrayBuilder2.add(obuilder.build());
                 }
+                //Lägg ihop kommentarerna med loggboken
                 arrayBuilder.add(Json.createObjectBuilder()
                         .add("id", logg_id)
                         .add("elev_id", obj.getInt("elev_id"))
@@ -100,12 +101,14 @@ public class ElevLoggManager {
         }
     }
 
+    //Spara ny loggbok
     public boolean postLogg(int id, String innehall, String datum, int ljus, String bild, boolean privat) {
         try {
             java.sql.Connection conn = ConnectionFactory.getConnection();
             Statement stmt = (Statement) conn.createStatement();
             String sql = "";
             int status = privat ? 3 : 0; // 0 = ej godkänd, 3 = privat
+            //Bild kan vara null
             if (bild != null) {
                 sql = String.format("INSERT INTO loggbok "
                         + "(elev_id, innehall, intryck, datum, bild, godkand) "
@@ -127,6 +130,7 @@ public class ElevLoggManager {
         }
     }
 
+    //Ta bort loggbok
     public boolean raderaLoggbok(int loggbok_id, int elev_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();

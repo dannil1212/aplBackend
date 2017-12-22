@@ -36,18 +36,15 @@ public class ElevMomentService {
     @Path("/moment")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMomentElev(@Context HttpHeaders headers) {
-
+        //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
 
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
-        if (payload
-                == null) {
+        if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         JsonObject elev = manager.getGoogleUser(payload.getSubject());
-        if (elev
-                == null) {
-
+        if (elev == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         int anvandar_id = elev.getInt("id");
@@ -67,8 +64,8 @@ public class ElevMomentService {
     public Response skickaMomentTillHandledare(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }

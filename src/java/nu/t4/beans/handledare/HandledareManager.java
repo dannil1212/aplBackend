@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.handledare;
 
 import java.sql.Connection;
@@ -23,6 +18,7 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class HandledareManager {
 
+    //Hämta alla handledarens elever
     public JsonArray getHLElever(int anv_id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -30,9 +26,8 @@ public class HandledareManager {
             String sqlBase = "SELECT namn, id FROM google_anvandare WHERE handledare_id = %d";
             String sql = String.format(sqlBase, anv_id);
             ResultSet data = stmt.executeQuery(sql);
-            
+
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            int lastID = -1;
             while (data.next()) {
                 JsonObjectBuilder obuilder = Json.createObjectBuilder();
                 obuilder.add("namn", data.getString("namn"));

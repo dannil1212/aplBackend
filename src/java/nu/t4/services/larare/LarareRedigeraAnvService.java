@@ -37,11 +37,12 @@ public class LarareRedigeraAnvService {
     public Response redigeraElev(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -63,8 +64,9 @@ public class LarareRedigeraAnvService {
         String email = obj.getString("email");
         int klass = obj.getInt("klass");
         int handledar_id = -1;
-        if (!obj.isNull("hl_id"))
+        if (!obj.isNull("hl_id")) {
             handledar_id = obj.getInt("hl_id");
+        }
         if (anvManager.redigeraElev(id, namn, tfnr, email, klass, handledar_id)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
@@ -79,11 +81,12 @@ public class LarareRedigeraAnvService {
     public Response redigeraHandledare(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -120,11 +123,12 @@ public class LarareRedigeraAnvService {
     public Response setElevHandledare(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
-        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
 
+        GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();

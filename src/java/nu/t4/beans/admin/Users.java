@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.admin;
 
 /**
@@ -27,6 +22,7 @@ public class Users {
     private String senast_inloggad;
     private String created;
 
+    //Getters & Setters
     public String getForetag() {
         return foretag;
     }

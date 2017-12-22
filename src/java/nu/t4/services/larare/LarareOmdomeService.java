@@ -32,14 +32,14 @@ public class LarareOmdomeService {
     @Path("/klass/{id}/omdome")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getOmdome(@Context HttpHeaders headers, @PathParam("id") int id) {
-
+        //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
 
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
-
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -58,20 +58,20 @@ public class LarareOmdomeService {
             return Response.serverError().build();
         }
     }
-    
+
     @GET
     @Path("/klass/{id}/omdome/{year}/{month}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getOmdomeNew(@Context HttpHeaders headers, 
+    public Response getOmdomeNew(@Context HttpHeaders headers,
             @PathParam("id") int klass_id, @PathParam("year") int year, @PathParam("month") int month) {
-
+        //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
 
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
-
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();

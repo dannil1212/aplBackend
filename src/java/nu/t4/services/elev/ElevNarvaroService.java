@@ -35,14 +35,13 @@ public class ElevNarvaroService {
     public Response postNarvaro(@Context HttpHeaders headers, String body) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = aplManager.googleAuth(idTokenString);
         if (payload == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         JsonObject elev = aplManager.getGoogleUser(payload.getSubject());
         if (elev == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         int id = elev.getInt("id");

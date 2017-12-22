@@ -37,6 +37,7 @@ public class InfoService {
     public Response getElevInfo(@Context HttpHeaders headers, @PathParam("id") int id) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -44,12 +45,11 @@ public class InfoService {
 
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Se till att användaren är en lärare
         int behorighet = user.getInt("behorighet");
-
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -69,6 +69,7 @@ public class InfoService {
     public Response getHandledareInfo(@Context HttpHeaders headers, @PathParam("id") int id) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -76,12 +77,11 @@ public class InfoService {
 
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Se till att användaren är en lärare
         int behorighet = user.getInt("behorighet");
-
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -100,6 +100,7 @@ public class InfoService {
     public Response getHandledare(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -107,12 +108,11 @@ public class InfoService {
 
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Se till att användaren är en lärare
         int behorighet = user.getInt("behorighet");
-
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -126,13 +126,14 @@ public class InfoService {
             return Response.serverError().build();
         }
     }
-    
+
     @GET
     @Path("/handledare/program/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getHLPerProgram(@Context HttpHeaders headers, @PathParam("id") int id) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -140,12 +141,11 @@ public class InfoService {
 
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Se till att användaren är en lärare
         int behorighet = user.getInt("behorighet");
-
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -164,6 +164,7 @@ public class InfoService {
     public Response getHandledareAlla(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -171,12 +172,11 @@ public class InfoService {
 
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Se till att användaren är en lärare
         int behorighet = user.getInt("behorighet");
-
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -197,15 +197,18 @@ public class InfoService {
     public Response getElevKontakt(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         JsonObject anvandare = manager.getGoogleUser(payload.getSubject());
         if (anvandare == null) {
 
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
         int anvandar_id = anvandare.getInt("id");
 
         JsonArray data = kontaktManager.getElevKontakt(anvandar_id);
@@ -226,8 +229,9 @@ public class InfoService {
         if (!manager.handledarAuth(basic_auth)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        int hl_id = manager.getHandledarId(basic_auth);
 
+        //Se till att användaren är en handledare
+        int hl_id = manager.getHandledarId(basic_auth);
         if (hl_id == -1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -246,17 +250,18 @@ public class InfoService {
     public Response kontaktLärare(@Context HttpHeaders headers) {
         //Kollar att inloggningen är ok
         String idTokenString = headers.getHeaderString("Authorization");
+
         GoogleIdToken.Payload payload = manager.googleAuth(idTokenString);
         if (payload == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         JsonObject user = manager.getGoogleUser(payload.getSubject());
         if (user == null) {
-
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        int behorighet = user.getInt("behorighet");
 
+        //Se till att användaren är en lärare
+        int behorighet = user.getInt("behorighet");
         if (behorighet != 1) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }

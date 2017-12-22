@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.larare;
 
 import java.sql.Connection;
@@ -21,6 +16,7 @@ import org.mindrot.jbcrypt.BCrypt;
 @Stateless
 public class LarareRedigeraAnvManager {
 
+    //Spara ändringar i elev
     public boolean redigeraElev(int id, String namn, String tfnr, String email,
             int klass, int handledar_id) {
         try {
@@ -28,6 +24,7 @@ public class LarareRedigeraAnvManager {
             Statement stmt = conn.createStatement();
             String sql = "UPDATE google_anvandare SET namn = '%s', "
                     + "telefonnummer = '%s', email = '%s', ";
+            //Handledare kan vara null
             if (handledar_id > -1) {
                 sql += "handledare_id = %d, ";
             } else {
@@ -40,7 +37,7 @@ public class LarareRedigeraAnvManager {
             } else {
                 sql = String.format(sql, namn, tfnr, email, klass, id);
             }
-            
+
             stmt.executeUpdate(sql);
             conn.close();
             return true;
@@ -50,6 +47,7 @@ public class LarareRedigeraAnvManager {
         }
     }
 
+    //Spara ändringar i handledare
     public boolean redigeraHandledare(int id, String namn, String tfnr,
             String email, String foretag, String anvandarnamn, String losenord) {
         try {
@@ -61,6 +59,7 @@ public class LarareRedigeraAnvManager {
                     + "foretag = '%s', "
                     + "anvandarnamn = '%s' ",
                     namn, tfnr, email, foretag, anvandarnamn);
+            //Om lösenordet ändrats, kryptera och spara det
             if (!losenord.equals("")) {
                 String encrypted_losenord = BCrypt.hashpw(losenord, BCrypt.gensalt());
                 sql += String.format(", losenord = '%s' ", encrypted_losenord);
@@ -76,6 +75,7 @@ public class LarareRedigeraAnvManager {
         }
     }
 
+    //Tilldela handledare till elever
     public boolean setElevHandledare(JsonArray array) {
         try {
             com.mysql.jdbc.Connection conn = ConnectionFactory.getConnection();
@@ -87,6 +87,7 @@ public class LarareRedigeraAnvManager {
             stmt.execute("START TRANSACTION;");
             try {
                 Iterator iterator = array.iterator();
+                //Byt alla till null
                 while (iterator.hasNext()) {
                     JsonObject item = (JsonObject) iterator.next();
                     int e_id = item.getInt("elev_id");
@@ -95,6 +96,7 @@ public class LarareRedigeraAnvManager {
                 }
                 stmt.executeBatch();
                 iterator = array.iterator();
+                //Byt alla till ny handledare
                 while (iterator.hasNext()) {
                     JsonObject item = (JsonObject) iterator.next();
                     int e_id = item.getInt("elev_id");
@@ -106,6 +108,7 @@ public class LarareRedigeraAnvManager {
                 }
                 stmt.executeBatch();
             } catch (Exception e) {
+                //Om nått gått fel, gå tillbaka till hur det var innan
                 System.out.println("ElevHandledare TRANSACTION Failed");
                 stmt.execute("ROLLBACK;");
                 conn.close();

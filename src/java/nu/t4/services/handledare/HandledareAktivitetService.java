@@ -1,6 +1,5 @@
 package nu.t4.services.handledare;
 
-import nu.t4.beans.larare.LarareHandledareManager;
 import javax.ejb.EJB;
 import javax.json.JsonArray;
 import javax.ws.rs.GET;
@@ -29,12 +28,14 @@ public class HandledareAktivitetService {
     @Path("/aktiviteter")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAktiviteter(@Context HttpHeaders headers) {
+        //Kollar att inloggningen är ok
         String basic_auth = headers.getHeaderString("Authorization");
 
         if (!manager.handledarAuth(basic_auth)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        //Hämtar handledaraktiviteter med 0
         int id = manager.getHandledarId(basic_auth);
         int HANDLEDARE = 0;
 

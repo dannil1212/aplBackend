@@ -1,10 +1,5 @@
 package nu.t4.beans.admin;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 import com.mysql.jdbc.Connection;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,8 +25,9 @@ import org.primefaces.context.RequestContext;
 @ApplicationScoped
 public class AdminManager implements Serializable {
 
+    //Mappen som har bilderna
     private final String pathToBilder = "C:\\inetpub\\wwwroot\\fileupload\\uploads";
-    
+
     private String klassnamn;
     private String programnamn;
     private String programIdNamn;
@@ -41,6 +37,7 @@ public class AdminManager implements Serializable {
     private int gamlaListaTyp;
     private int gamlaMonths;
 
+    //Filtreringsvariabler används för sökningarna
     private List filteredRadElever;
     private List filteredRadLarare;
     private List filteredRadHL;
@@ -173,7 +170,9 @@ public class AdminManager implements Serializable {
     }
 
     public List getIgnoreradeGamla() {
-        if (ignoreradeGamla == null) setIgnoreradeGamla(new ArrayList());
+        if (ignoreradeGamla == null) {
+            setIgnoreradeGamla(new ArrayList());
+        }
         return ignoreradeGamla;
     }
 
@@ -182,30 +181,35 @@ public class AdminManager implements Serializable {
     }
 
     //Getters och setters slut
+    //Visa redigeringssidan och spara vald skolanvändare
     public String redigeraSkAnv(Users temp) {
         selectedUser = new Users();
         selectedUser = temp;
         return "redigeraSkAnv";
     }
 
+    //Visa redigeringssidan och spara vald handledare
     public String redigeraHL(Users temp) {
         selectedHL = new Users();
         selectedHL = temp;
         return "redigeraHL";
     }
 
+    //Lägg till vald användare till ignoreringslistan (i ta bort gamla)
     public void ignoreraGammal(Users user) {
         getIgnoreradeGamla().add(user);
         resetFilters();
     }
-    
+
+    //Sluta ignorera vald användare
     public void slutaIgnoreraGammal(int index) {
-        if(getIgnoreradeGamla().toArray().length > index) {
+        if (getIgnoreradeGamla().toArray().length > index) {
             getIgnoreradeGamla().remove(index);
             resetFilters();
         }
     }
 
+    //Sluta ignorera alla användare
     public void tomIgnorerade() {
         getIgnoreradeGamla().clear();
         resetFilters();
@@ -216,6 +220,7 @@ public class AdminManager implements Serializable {
         try {
             int programid = 0;
             programid = getProgramId(programIdNamn);
+            //Måste ha ett namn & program
             if (!klassnamn.equals("") && programid != 0) {
                 Connection conn = ConnectionFactory.getConnection();
                 Statement stmt = conn.createStatement();
@@ -234,7 +239,7 @@ public class AdminManager implements Serializable {
         }
     }
 
-    //Hamtar alla klasser
+    //Hamtar alla klasser, Klassnamn + Programnamn
     public List getClasses() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -254,10 +259,11 @@ public class AdminManager implements Serializable {
         }
     }
 
-    //Tar bort klassen från listan med alla klasser
+    //Tar bort vald klass
     public void removeClass(String namn) {
         try {
             String tempArray[];
+            //"klassnamn, programnamn" -> ["klassnamn","programnamn"]
             tempArray = namn.split(", ");
 
             Connection conn = ConnectionFactory.getConnection();
@@ -270,7 +276,7 @@ public class AdminManager implements Serializable {
         }
     }
 
-    //Hämtar alla användare som inte har lärarbehörighet
+    //Hämtar alla användare som inte har lärarbehörighet, ID & Namn & Email
     public List getUsers() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -314,7 +320,6 @@ public class AdminManager implements Serializable {
 
     //Tar bort behörigheten som lärare mha deras email
     public void removeBehorighet(String email) {
-        System.out.println("removing" + email);
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
@@ -329,7 +334,7 @@ public class AdminManager implements Serializable {
         requestContext.execute("PF('anvTable').filter()");
     }
 
-    //Hämtar alla som har lärarbehörighet
+    //Hämtar alla som har lärarbehörighet, ID & Namn & Email
     public List getLarare() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -353,6 +358,7 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Hämtar alla handledare, ID & Namn & Företag
     public List getHandledare() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -376,6 +382,7 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Hämtar alla program, ID & Namn
     public List getProgram() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -397,6 +404,7 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Hämtar alla klasser, ID & Namn
     public List getKlasser() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -421,6 +429,7 @@ public class AdminManager implements Serializable {
     //Lägger till ett nytt program
     public void addProgram() {
         try {
+            //Måste ha ett namn
             if (!programnamn.equals("")) {
                 programnamn = programnamn.trim();
                 Connection conn = ConnectionFactory.getConnection();
@@ -430,13 +439,14 @@ public class AdminManager implements Serializable {
                 stmt.executeUpdate(sql);
                 conn.close();
             }
+            //Töm textfältet
             programnamn = "";
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    //Hämtar alla program
+    //Hämtar alla program, Namn
     public List getPrograms() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -468,7 +478,7 @@ public class AdminManager implements Serializable {
         }
     }
 
-    //Hämtar id på inmatat program
+    //Hämtar id på program med dess namn
     public int getProgramId(String namn) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -485,6 +495,8 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Hämtar alla elever + lärare
+    //ID & Namn & Tfnr & Email & klass & HL id & HL namn & behörighet
     public List getSkolansAnvandare() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -512,23 +524,27 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Hämtar alla användare som ej har loggat in på minst 12 månader & ej har en klass
     public List getGamlaAnv() {
         try {
+            //Minst 12 månader om användaren inte matat in ett högre nummer
             int months = 12;
             if (getGamlaMonths() > 12) {
                 months = getGamlaMonths();
             }
 
+            //Välj elever eller lärare
             int behorighet = 0;
             if (getGamlaListaTyp() == 1) {
                 behorighet = 1;
             }
-            
+
+            //Undantag
             String ignored = "-1";
-            if(ignoreradeGamla.toArray().length > 0) {
+            if (ignoreradeGamla.toArray().length > 0) {
                 ignored = usersToSqlArray(ignoreradeGamla);
             }
-            
+
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format("SELECT id, namn, email, senast_inloggad, created FROM google_anvandare "
@@ -537,21 +553,23 @@ public class AdminManager implements Serializable {
                     + "AND klass IS NULL AND behorighet = %d "
                     + "AND id NOT IN (%s) "
                     + "ORDER BY senast_inloggad DESC", months, behorighet, ignored);
-            
+
             ResultSet data = stmt.executeQuery(sql);
             List<Users> google_anvandare = new ArrayList();
             while (data.next()) {
                 Users temp = new Users();
                 int id = data.getInt("id");
-                
+
+                //Det bör inte finnas några ignorerade i resultatet
+                //Lika bra att vara säker när det handlar om att ta bort användare
                 if (getIgnoreradeGamla().contains(id)) {
                     continue;
                 }
-                
+
                 temp.setId(id);
                 temp.setNamn(data.getString("namn"));
                 temp.setEmail(data.getString("email"));
-                
+
                 temp.setSenast_inloggad(
                         new SimpleDateFormat("yyyy-MM-dd").format(
                                 data.getTimestamp("senast_inloggad")
@@ -572,6 +590,8 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Hämtar handledare
+    //ID & namn & tfnr & email & program id & användarnamn & företag
     public List getHandledareAnv() {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -599,6 +619,7 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Spara ändringar i skolanvändare
     public String sparaSkAnv() {
         try {
             int id = selectedUser.getId();
@@ -606,12 +627,12 @@ public class AdminManager implements Serializable {
             String tfnr = selectedUser.getTfnr();
             String email = selectedUser.getEmail();
             int klass = selectedUser.getKlass();
-            System.out.println(selectedUser.getHl_id());
             int hl_id = selectedUser.getHl_id();
 
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "";
+            //Handledare kan vara null
             if (hl_id == 0) {
                 sql = String.format("UPDATE google_anvandare SET namn = '%s', "
                         + "telefonnummer = '%s', "
@@ -636,6 +657,7 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Spara ändringar i handledare
     public String sparaHL() {
         try {
             int id = selectedHL.getId();
@@ -656,6 +678,7 @@ public class AdminManager implements Serializable {
                     + "program_id = %d, "
                     + "anvandarnamn = '%s' ",
                     namn, tfnr, email, foretag, p_id, anvnamn);
+            //Om nytt lösenord skrivits in, kryptera & uppdatera det
             if (!losenord.equals("")) {
                 String encrypted_losenord = BCrypt.hashpw(losenord, BCrypt.gensalt());
                 sql += String.format(", losenord = '%s' ", encrypted_losenord);
@@ -670,6 +693,7 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Ta bort vald handledare
     public String raderaHandledare(int id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
@@ -685,24 +709,29 @@ public class AdminManager implements Serializable {
         }
     }
 
+    //Ta bort vald elev eller lärare
     public String raderaGoogle(int id) {
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
-            
+
+            //Hämta bilderna från loggböckerna först om de finns
             String sql = String.format("SELECT bild FROM loggbok, google_anvandare "
                     + "WHERE google_anvandare.id = %d "
                     + "AND google_anvandare.id = loggbok.elev_id "
                     + "AND bild IS NOT NULL ", id);
-            
+
             ResultSet data = stmt.executeQuery(sql);
             List bilder = new ArrayList<>();
             while (data.next()) {
+                //Spara bilderna för borttagning
                 bilder.add(data.getString("bild"));
             }
+            //Ta bort användaren
             sql = String.format("DELETE FROM google_anvandare WHERE id = %d", id);
             stmt.executeUpdate(sql);
             conn.close();
+            //Om allt fungerat, ta bort bilderna
             raderaBilder(bilder);
             resetFilters();
             return "raderaMain";
@@ -711,7 +740,8 @@ public class AdminManager implements Serializable {
             return "raderaMain";
         }
     }
-    
+
+    //Ta bort gamla användare
     public void raderaGamlaAnv() {
         try {
             int months = 12;
@@ -723,16 +753,17 @@ public class AdminManager implements Serializable {
             if (getGamlaListaTyp() == 1) {
                 behorighet = 1;
             }
-            
+
             String ignored = "-1";
-            if(ignoreradeGamla.toArray().length > 0) {
+            if (ignoreradeGamla.toArray().length > 0) {
                 ignored = usersToSqlArray(ignoreradeGamla);
             }
-            
+
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             stmt.execute("START TRANSACTION");
-            
+
+            //Hämta bilderna först
             String sql = String.format("SELECT bild FROM loggbok, google_anvandare "
                     + "WHERE senast_inloggad < DATE_SUB(NOW(),INTERVAL 12 MONTH) " //just in case
                     + "AND senast_inloggad < DATE_SUB(NOW(),INTERVAL %d MONTH) "
@@ -741,38 +772,46 @@ public class AdminManager implements Serializable {
                     + "AND google_anvandare.id = loggbok.elev_id "
                     + "AND bild IS NOT NULL "
                     + "ORDER BY senast_inloggad DESC", months, behorighet, ignored);
-            
+
             ResultSet data = stmt.executeQuery(sql);
             List bilder = new ArrayList<>();
             while (data.next()) {
+                //Spara för borttagning
                 bilder.add(data.getString("bild"));
             }
-            
+
+            //Ta bort användarna
             sql = String.format("DELETE FROM google_anvandare "
                     + "WHERE senast_inloggad < DATE_SUB(NOW(),INTERVAL 12 MONTH) " //just in case
                     + "AND senast_inloggad < DATE_SUB(NOW(),INTERVAL %d MONTH) "
                     + "AND klass IS NULL AND behorighet = %d "
                     + "AND id NOT IN (%s) "
                     + "ORDER BY senast_inloggad DESC", months, behorighet, ignored);
-            
+
             stmt.executeUpdate(sql);
             stmt.execute("COMMIT");
             conn.close();
+            //Om allt fungerat, ta bort bilderna
             raderaBilder(bilder);
             resetFilters();
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }    
+        }
     }
-    
+
+    //Tar bort bilder
     private void raderaBilder(List<String> bilder) throws IOException {
-        for(int i = 0; i < bilder.size(); i++) {
+        for (int i = 0; i < bilder.size(); i++) {
+            //Filnamn på bilden
             String bild = bilder.get(i).replaceAll("\"", "");
+            //Path till bilden
             Path fullPath = FileSystems.getDefault().getPath(pathToBilder, bild);
+            //Ta bort om filen finns
             Files.deleteIfExists(fullPath);
         }
     }
 
+    //Rensa sökningar
     public void resetFilters() {
         setFilteredRadGamla(getGamlaAnv());
         setFilteredAnv(getSkolansAnvandare());
@@ -784,6 +823,7 @@ public class AdminManager implements Serializable {
         requestContext.execute("PF('anvTable').filter()");
     }
 
+    //Rensa sökningar
     public void resetLarareFilter() {
         setFilteredLarare(getLarare());
         setFilteredUsers(getUsers());
@@ -791,12 +831,13 @@ public class AdminManager implements Serializable {
         requestContext.execute("PF('larareTable').filter()");
         requestContext.execute("PF('userTable').filter()");
     }
-    
+
+    //Tar ID från varje User i en lista & lägger ihop dem med ", "
     private static String usersToSqlArray(List<Users> users) {
         StringBuilder sb = new StringBuilder();
         boolean doneOne = false;
-        for(Users user: users){
-            if(doneOne){
+        for (Users user : users) {
+            if (doneOne) {
                 sb.append(", ");
             }
             sb.append(user.getId());

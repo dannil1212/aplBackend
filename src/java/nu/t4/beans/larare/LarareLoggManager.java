@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package nu.t4.beans.larare;
 
 import com.mysql.jdbc.Connection;
@@ -25,64 +20,19 @@ import nu.t4.beans.ConnectionFactory;
 @Stateless
 public class LarareLoggManager {
 
+    //Hämtar loggböcker från elev
     public JsonArray getLoggar(int elev_id) {
-
-        try {
-
-            Connection conn = ConnectionFactory.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = String.format("SELECT loggbok.*, google_anvandare.namn"
-                    + " FROM loggbok, google_anvandare WHERE loggbok.elev_id = "
-                    + "google_anvandare.id AND loggbok.elev_id = %d ORDER BY loggbok.datum DESC", elev_id);
-            ResultSet data = stmt.executeQuery(sql);
-
-            JsonArrayBuilder jsonArray = Json.createArrayBuilder();
-            while (data.next()) {
-
-                String stringIntryck = "";
-                int intryck = data.getInt("intryck");
-                if (intryck == 0) {
-                    stringIntryck = "dålig";
-                } else if (intryck == 1) {
-                    stringIntryck = "sådär";
-                } else if (intryck == 2) {
-                    stringIntryck = "bra";
-                } else {
-                    stringIntryck = "FEL";
-                }
-
-                jsonArray.add(Json.createObjectBuilder()
-                        .add("id", data.getInt("id"))
-                        .add("elev_id", data.getInt("elev_id"))
-                        .add("innehall", data.getString("innehall"))
-                        .add("intryck", data.getInt("intryck"))
-                        .add("datum", data.getInt("datum"))
-                        .add("bild_id", data.getInt("bild_id"))
-                        .build());
-            }
-
-            conn.close();
-            return jsonArray.build();
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
-    }
-
-    public JsonArray getLoggar(int techer_id, int elev_id) {
-
         try {
             Connection conn = ConnectionFactory.getConnection();
             Statement stmt = conn.createStatement();
             String sql = String.format("SELECT * FROM loggbokvy WHERE "
-                    + "loggbokvy.elev_id = %d ORDER BY loggbokvy.datum DESC", elev_id);
+                    + "loggbokvy.elev_id = %d "
+                    + "ORDER BY loggbokvy.datum DESC", elev_id);
             ResultSet data = stmt.executeQuery(sql);
 
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
             while (data.next()) {
-                String stringIntryck = "";
+                String stringIntryck;
                 int intryck = data.getInt("intryck");
                 if (intryck == 0) {
                     stringIntryck = "dålig";
@@ -112,6 +62,7 @@ public class LarareLoggManager {
             }
             JsonArray array1 = arrayBuilder.build();
             Iterator<JsonValue> iterator = array1.iterator();
+            //Hämta kommentarer för varje loggbok
             while (iterator.hasNext()) {
                 JsonObject obj = (JsonObject) iterator.next();
                 JsonArrayBuilder arrayBuilder2 = Json.createArrayBuilder();
@@ -127,6 +78,7 @@ public class LarareLoggManager {
                             .add("namn", data2.getString("namn"));
                     arrayBuilder2.add(obuilder.build());
                 }
+                //Lägg till kommentarer i loggboken
                 arrayBuilder.add(Json.createObjectBuilder()
                         .add("id", logg_id)
                         .add("elev_id", obj.getInt("elev_id"))
@@ -148,5 +100,4 @@ public class LarareLoggManager {
             return null;
         }
     }
-
 }
